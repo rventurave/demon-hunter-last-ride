@@ -1,0 +1,17 @@
+{
+  "name": "Reins",
+  "rootNamespace": "Reins",
+  "references": [
+    "Oculus.Interaction",
+    "JapaneseDemonHunter.Prototype"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

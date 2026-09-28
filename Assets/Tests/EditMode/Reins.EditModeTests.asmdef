@@ -1,0 +1,23 @@
+{
+  "name": "Reins.EditModeTests",
+  "rootNamespace": "Reins.Tests",
+  "references": [
+    "Reins",
+    "Oculus.Interaction",
+    "JapaneseDemonHunter.Prototype"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "name": "JapaneseDemonHunter.Gameplay",
+  "rootNamespace": "JapaneseDemonHunter.Gameplay",
+  "references": [
+    "JapaneseDemonHunter.Prototype",
+    "JapaneseDemonHunter.Monsters",
+    "Reins",
+    "Oculus.Interaction",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
