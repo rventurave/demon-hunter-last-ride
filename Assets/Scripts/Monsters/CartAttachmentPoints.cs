@@ -8,6 +8,8 @@ namespace JapaneseDemonHunter.Monsters
     public sealed class CartAttachmentPoints : MonoBehaviour
     {
         [SerializeField] private List<MonsterAttachmentPoint> points = new List<MonsterAttachmentPoint>();
+        [Tooltip("Legacy scenes can restrict reservations to the rear; disable to use side points as well.")]
+        [SerializeField] private bool rearPointsOnly = true;
 
         public IReadOnlyList<MonsterAttachmentPoint> Points => points;
         public int OccupiedCount => points.Where(point => point != null).Sum(point => point.OccupiedCount);
@@ -34,7 +36,7 @@ namespace JapaneseDemonHunter.Monsters
             selected = null;
             foreach (MonsterAttachmentPoint candidate in points
                          .Where(point => point != null && point.HasCapacity && point.Accepts(kind) &&
-                                         (cart == null || Vector3.Dot(point.transform.position - cart.position,
+                                         (!rearPointsOnly || cart == null || Vector3.Dot(point.transform.position - cart.position,
                                              rearDirection.sqrMagnitude > 0.1f ? rearDirection : cart.forward) > 0.5f))
                          .OrderBy(point => (point.transform.position - worldPosition).sqrMagnitude))
             {

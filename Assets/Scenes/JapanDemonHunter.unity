@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.11
   m_LinearFogStart: 4
   m_LinearFogEnd: 26
-  m_AmbientSkyColor: {r: 0.006, g: 0.007, b: 0.008, a: 1}
+  m_AmbientSkyColor: {r: 0.012, g: 0.014, b: 0.016, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -1484,6 +1484,64 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 224293635}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &229721509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 229721511}
+  - component: {fileID: 229721510}
+  m_Layer: 0
+  m_Name: DesktopDebug
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &229721510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229721509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f491ccb309760bb4f922a236361df846, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JapaneseDemonHunter.Gameplay::JapaneseDemonHunter.Gameplay.DesktopDebugMode
+  desktopDebugMode: 0
+  eyeHeight: 1.6
+  mouseSensitivity: 0.12
+  cameraMoveSpeed: 1.5
+  cameraHalfExtents: {x: 1.05, y: 1.35}
+  zombieSpawnRadius: 15
+  lateralSpawnAngle: 12
+  groupSpawnCount: 4
+  swordViewOffset: {x: 0.28, y: -0.35, z: 0.4}
+  swingStartEuler: {x: 0, y: -55, z: 0}
+  swingEndEuler: {x: 0, y: 55, z: 0}
+  showHud: 1
+  showGizmos: 1
+  logEvents: 1
+--- !u!4 &229721511
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 229721509}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &262590440
 GameObject:
   m_ObjectHideFlags: 0
@@ -2602,7 +2660,7 @@ MonoBehaviour:
   spawnEntries:
   - prefab: {fileID: 2514441445142112990, guid: 460b84f19a8943649a5c0cd5d5346500, type: 3}
     movementType: 0
-    spawnDirection: 0
+    spawnDirection: 2
     isFaceThreat: 0
     frontLaneForwardRadius: 12
     frontLaneFlyingAltitude: 4
@@ -2634,7 +2692,7 @@ MonoBehaviour:
   waitForFirstGallop: 1
   spawnInterval: 11
   initialSpawnDelay: 38
-  minimumHordeSize: 6
+  minimumHordeSize: 0
   fastHordeFraction: 0.34
   fastHordeSpeedMultiplier: 1.5
   hordeRefillInterval: 0.5
@@ -2656,6 +2714,7 @@ MonoBehaviour:
     m_Bits: 4294967295
   maximumDespawnDistance: 90
   rearSpawnHalfAngle: 48
+  frontSpawnHalfAngle: 12
   frontLaneSpacing: 2.8
 --- !u!114 &505499165
 MonoBehaviour:
@@ -2690,6 +2749,9 @@ MonoBehaviour:
   - {fileID: 1828222133}
   - {fileID: 1383841115}
   - {fileID: 1466847284}
+  - {fileID: 2089249356}
+  - {fileID: 1829492986}
+  rearPointsOnly: 0
 --- !u!114 &505499167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4213,7 +4275,7 @@ MonoBehaviour:
   startingSpeed: 3.5
   accelerationPerStroke: 1.5
   brakingPerPull: 0.9
-  coastingDeceleration: 0.2
+  decelerationRate: 0.2
   laneWidth: 2.8
   laneShiftDuration: 0.8
   boundarySpeedPenalty: 0.7
@@ -4355,6 +4417,8 @@ Transform:
   - {fileID: 1383841114}
   - {fileID: 1466847283}
   - {fileID: 1415056009}
+  - {fileID: 2089249355}
+  - {fileID: 1829492985}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1037195783
@@ -4382,13 +4446,13 @@ MonoBehaviour:
   victoryController: {fileID: 505499161}
   sessionController: {fileID: 0}
   frontColor: {r: 1, g: 0.78, b: 0.44, a: 1}
-  frontIntensity: 6
+  frontIntensity: 7
   frontRange: 24
   gallopCueStartSpeed: 3.4
   gallopCueMaximumSpeed: 8
   gallopIntensityBoost: 0.18
   rearColor: {r: 1, g: 0.78, b: 0.44, a: 1}
-  rearIntensity: 5
+  rearIntensity: 6
   rearRange: 22
   modulationAmplitude: 0.14
   modulationFrequency: 0.16
@@ -4884,7 +4948,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2840825195494141548, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_Height
-      value: 0.8
+      value: 0.98
       objectReference: {fileID: 0}
     - target: {fileID: 2840825195494141548, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_Radius
@@ -4892,7 +4956,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2840825195494141548, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_Center.z
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2840825195494141548, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_Direction
@@ -4912,15 +4976,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.55
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.6302493
+      value: 1.3102493
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.45
+      value: -0.95000005
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4989,6 +5053,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7010552877223865617, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1144258002}
+    - targetCorrespondingSourceObject: {fileID: 7010552877223865617, guid: 658245a04427ea7479977447eef58b8d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1144258009}
+    - targetCorrespondingSourceObject: {fileID: 7010552877223865617, guid: 658245a04427ea7479977447eef58b8d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1144258008}
   m_SourcePrefab: {fileID: 100100000, guid: 658245a04427ea7479977447eef58b8d, type: 3}
 --- !u!4 &1144257998 stripped
 Transform:
@@ -5034,9 +5104,128 @@ MonoBehaviour:
   velocityReference: {fileID: 1037195782}
   throwSpeed: 2.5
   fallAcceleration: 9.81
-  deckLocalHeight: 0.6302493
+  deckLocalHeight: 1.3102493
   throwSpin: 8
   minimumDropHeight: 0.05
+--- !u!114 &1144258008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1144257999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b2756d7ddefcef4e873b340ab627877, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JapaneseDemonHunter.Gameplay::JapaneseDemonHunter.Gameplay.SwordSwingAudio
+  swordDamage: {fileID: 1500901369}
+  audioSource: {fileID: 1144258009}
+  swordSounds:
+  - {fileID: 8300000, guid: f7b63a386b20ebe4abb84275e6ee9d96, type: 3}
+  - {fileID: 8300000, guid: 436706c1116e586499a9cf600a5574e0, type: 3}
+  - {fileID: 8300000, guid: 4eebd5e474b828e44985571aa5e31258, type: 3}
+  - {fileID: 8300000, guid: b2112ce59e011154ba0613ded669968a, type: 3}
+  - {fileID: 8300000, guid: 99eaf7a8a3dd7b9499b54fdc509fd3f6, type: 3}
+  volume: 0.35
+  avoidImmediateRepeat: 1
+--- !u!82 &1144258009
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1144257999}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 0.5
+  MaxDistance: 8
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1192175195
 GameObject:
   m_ObjectHideFlags: 0
@@ -6172,7 +6361,7 @@ GameObject:
   - component: {fileID: 1449857303}
   - component: {fileID: 1449857304}
   m_Layer: 0
-  m_Name: Attach_RearCenter
+  m_Name: RearCenterAttachPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6187,7 +6376,7 @@ Transform:
   m_GameObject: {fileID: 1449857302}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1, z: 2.7891273}
+  m_LocalPosition: {x: 0, y: 0.15, z: 2.1891277}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6206,8 +6395,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAttachmentPoint
   acceptedKinds: 1
-  capacity: 2
-  localFacingDirection: {x: 0, y: 0, z: -1}
+  capacity: 1
+  localFacingDirection: {x: -0, y: 0, z: -1}
 --- !u!1 &1455049024
 GameObject:
   m_ObjectHideFlags: 0
@@ -6609,7 +6798,7 @@ Transform:
   m_GameObject: {fileID: 1500901367}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.58}
+  m_LocalPosition: {x: 0, y: 0, z: 0.69}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8000,15 +8189,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalScale.x
-      value: 27.370607
+      value: 31.556665
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalScale.y
-      value: 27.370607
+      value: 31.556665
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalScale.z
-      value: 27.370607
+      value: 31.556665
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -8016,11 +8205,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.0000016314153
+      value: -0.0000018809238
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.040314004
+      value: -0.077067606
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e285107d3452a054bb876328852e8ae5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8181,7 +8370,7 @@ GameObject:
   - component: {fileID: 1828222132}
   - component: {fileID: 1828222133}
   m_Layer: 0
-  m_Name: Attach_RightRear
+  m_Name: RearRightAttachPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8196,7 +8385,7 @@ Transform:
   m_GameObject: {fileID: 1828222131}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.6, y: 1, z: 2.3891273}
+  m_LocalPosition: {x: 0.98965746, y: 0.15, z: 2.1891277}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8216,7 +8405,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAttachmentPoint
   acceptedKinds: 1
   capacity: 1
-  localFacingDirection: {x: 0, y: 0, z: -1}
+  localFacingDirection: {x: -0.41193902, y: 0, z: -0.9112114}
+--- !u!1 &1829492984
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1829492985}
+  - component: {fileID: 1829492986}
+  m_Layer: 0
+  m_Name: RightAttachPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1829492985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829492984}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.8896575, y: 0.15, z: 0.23912764}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1037195782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1829492986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1829492984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761e37460689750468b2f1761280f2ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAttachmentPoint
+  acceptedKinds: 1
+  capacity: 1
+  localFacingDirection: {x: -0.992088, y: 0, z: -0.12554426}
 --- !u!1 &1851195053
 GameObject:
   m_ObjectHideFlags: 0
@@ -9417,7 +9653,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.695
+      value: 0.56024927
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -9425,11 +9661,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.00000004371139
+      value: 0.000000029114396
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalRotation.y
@@ -9437,7 +9673,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9622,7 +9858,7 @@ GameObject:
   - component: {fileID: 1931554945}
   - component: {fileID: 1931554946}
   m_Layer: 0
-  m_Name: Attach_LeftRear
+  m_Name: RearLeftAttachPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9637,7 +9873,7 @@ Transform:
   m_GameObject: {fileID: 1931554944}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.6, y: 1, z: 2.3891273}
+  m_LocalPosition: {x: -0.98965746, y: 0.15, z: 2.1891277}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9657,7 +9893,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAttachmentPoint
   acceptedKinds: 1
   capacity: 1
-  localFacingDirection: {x: 0, y: 0, z: -1}
+  localFacingDirection: {x: 0.41193902, y: 0, z: -0.9112114}
 --- !u!1 &1935316143
 GameObject:
   m_ObjectHideFlags: 0
@@ -9687,7 +9923,7 @@ Light:
   serializedVersion: 13
   m_Type: 1
   m_Color: {r: 0.62, g: 0.68, b: 0.86, a: 1}
-  m_Intensity: 0.34
+  m_Intensity: 0.4
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -10086,6 +10322,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2044598178}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &2089249354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2089249355}
+  - component: {fileID: 2089249356}
+  m_Layer: 0
+  m_Name: LeftAttachPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2089249355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2089249354}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.8896575, y: 0.15, z: 0.23912764}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1037195782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2089249356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2089249354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 761e37460689750468b2f1761280f2ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAttachmentPoint
+  acceptedKinds: 1
+  capacity: 1
+  localFacingDirection: {x: 0.992088, y: 0, z: -0.12554426}
 --- !u!1 &2129620961
 GameObject:
   m_ObjectHideFlags: 0
@@ -10196,3 +10479,4 @@ SceneRoots:
   - {fileID: 1866750350}
   - {fileID: 224086064}
   - {fileID: 505499168}
+  - {fileID: 229721511}

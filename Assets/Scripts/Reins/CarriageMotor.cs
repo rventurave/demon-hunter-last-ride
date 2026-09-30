@@ -1,6 +1,7 @@
 using System;
 using JapaneseDemonHunter.Prototype;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Reins
 {
@@ -17,7 +18,8 @@ namespace Reins
         [SerializeField, Min(0.1f)] private float accelerationPerStroke = 1.6f;
         [SerializeField, Min(0.1f)] private float brakingPerPull = 0.9f;
         [Tooltip("Speed lost per second when the player stops galloping: this is what brings the carriage to a halt.")]
-        [SerializeField, Min(0f)] private float coastingDeceleration = 0.7f;
+        [FormerlySerializedAs("coastingDeceleration")]
+        [SerializeField, Min(0f)] private float decelerationRate = 0.7f;
         [SerializeField, Min(0.1f)] private float laneWidth = 2.8f;
         [SerializeField, Min(0.1f)] private float laneShiftDuration = 0.8f;
         [SerializeField, Min(0.1f)] private float boundarySpeedPenalty = 0.7f;
@@ -143,7 +145,7 @@ namespace Reins
 
             if (!_stopModel.IsStopped)
             {
-                _speed = Mathf.MoveTowards(_speed, 0f, coastingDeceleration * deltaTime);
+                _speed = Mathf.MoveTowards(_speed, 0f, Mathf.Max(0f, decelerationRate) * deltaTime);
             }
 
             ClampSpeed();

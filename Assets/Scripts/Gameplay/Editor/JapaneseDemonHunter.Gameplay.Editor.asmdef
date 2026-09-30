@@ -10,7 +10,10 @@
     "Oculus.Interaction.OVR.Editor",
     "Unity.InputSystem",
     "UnityEngine.UI",
-    "Unity.RenderPipelines.Core.Runtime"
+    "Unity.RenderPipelines.Core.Runtime",
+    "Unity.XR.Management",
+    "Unity.XR.Management.Editor",
+    "Unity.XR.OpenXR"
   ],
   "includePlatforms": [
     "Editor"

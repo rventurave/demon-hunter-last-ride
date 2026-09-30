@@ -1,0 +1,49 @@
+Quest Diagnostics — Unity 6000.6.2f1 — 2026-09-30T19:49:58.5507107Z
+Escena activa: Assets/Scenes/JapanDemonHunter.unity; Play: False; plataforma: StandaloneWindows64
+[OK] Paquete com.unity.xr.openxr: 1.18.0
+[OK] Paquete com.unity.xr.management: 4.7.0
+[OK] Paquete com.unity.inputsystem: 1.20.0
+[AVISO] XR Interaction Toolkit: no instalado; el proyecto utiliza Meta Interaction SDK
+[OK] OpenXR activo en Android: True
+[OK] Initialize XR on Startup Android: True
+[OK] Android/MetaXRFeature: True
+[OK] Android/OculusTouchControllerProfile: True
+[OK] Meta Quest Support (Unity): True; distinto de Meta XR Feature
+[INFO] Android: renderMode=SinglePassInstanced; features activas: MetaQuestFeature, MetaXRFeature, OculusTouchControllerProximityProfile, MetaXRSubsampledLayout, SpaceWarpFeature, OculusTouchControllerProfile
+[AVISO] OpenXR Validation Android: Using the Screen Space Ambient Occlusion render feature results in significant performance overhead when the application is running natively on device. Disabling or removing that render feature is recommended.
+[AVISO] OpenXR Validation Android: [Optional] Latency Optimization is recommended to be set to <b>Prioritize Input Polling</b> when Meta Quest support is enabled.
+[AVISO] OpenXR Validation Android: This OpenXR Feature targets an API version with a patch version lower than 1.1.54, which is the recommended version for this package. The requested API version will be ignored.
+[AVISO] OpenXR Validation Android: This OpenXR Feature targets an API version with a patch version lower than 1.1.54, which is the recommended version for this package. The requested API version will be ignored.
+[OK] OpenXR activo en Standalone: True
+[OK] Initialize XR on Startup Standalone: True
+[OK] Standalone/MetaXRFeature: True
+[OK] Standalone/OculusTouchControllerProfile: True
+[INFO] Standalone: renderMode=SinglePassInstanced; features activas: ApiLayersFeature, MetaXRFeature, OculusTouchControllerProfile, OculusTouchControllerProximityProfile
+[AVISO] OpenXR Validation Standalone: This OpenXR Feature targets an API version with a patch version lower than 1.1.54, which is the recommended version for this package. The requested API version will be ignored.
+[AVISO] OpenXR Validation Standalone: This OpenXR Feature targets an API version with a patch version lower than 1.1.54, which is the recommended version for this package. The requested API version will be ignored.
+[AVISO] XR Origin (XRI/Core Utils): 0; OVRCameraRig: 1
+[OK] Rigs XR encontrados: 1 (se espera uno)
+[OK] Rig VehicleRoot/OVRCameraRig activo: True
+[OK] Cámaras XR encontradas: 3
+[OK] Cámara VehicleRoot/OVRCameraRig/TrackingSpace/LeftEyeAnchor activa=False, tag=MainCamera, stereo=Left, near=0.3 (ojo auxiliar; normal desactivado con cámara central)
+[OK] Proveedor de tracking: OVRCameraRig; configurado=True
+[OK] Cámara VehicleRoot/OVRCameraRig/TrackingSpace/CenterEyeAnchor activa=True, tag=MainCamera, stereo=Both, near=0.1
+[OK] Proveedor de tracking: OVRCameraRig; configurado=True
+[OK] Cámara VehicleRoot/OVRCameraRig/TrackingSpace/RightEyeAnchor activa=False, tag=Untagged, stereo=Right, near=0.3 (ojo auxiliar; normal desactivado con cámara central)
+[OK] Proveedor de tracking: OVRCameraRig; configurado=True
+[OK] Left: anclajes=2, componentes de controlador=1. No demuestra conexión física ni interacción Touch.
+[OK] Right: anclajes=2, componentes de controlador=1. No demuestra conexión física ni interacción Touch.
+[INFO] OVRManager/usePositionTracking: True
+[INFO] OVRManager/useRotationTracking: True
+[INFO] OVRManager/controllerDrivenHandPosesType: 0
+[INFO] OVRManager/_trackingOriginType: 1
+[AVISO] Input Action Manager (XRI): 0; Meta SDK gestiona su propio input
+[INFO] Input Actions InputSystem_Actions: 2/2 mapas activos (Edit Mode no prueba activación en Play)
+[OK] DesktopDebugMode=False, componente activo=True; exclusivo del Editor. Cambiar antes de Play y reiniciar la sesión.
+[OK] Arquitectura Android: ARM64
+[OK] Backend Android: IL2CPP
+[INFO] API Android: min=AndroidApiLevel32, target=AndroidApiLevel34; gráficos=Vulkan, OpenGLES3
+[AVISO] Application Identifier Android: com.UnityTechnologies.com.unity.template.urpblank
+[OK] Escena principal habilitada en lista global; revisar también override del Build Profile activo.
+[OK] Android Build Support instalado
+Resultado: 0 errores; 10 avisos. Hardware/USB/ADB y rendimiento Quest no verificados.

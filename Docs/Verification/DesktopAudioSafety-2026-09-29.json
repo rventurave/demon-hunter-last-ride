@@ -1,0 +1,14 @@
+{
+  "singleValidClipSafe": true,
+  "unassignedArraySafe": true,
+  "nullArraySafe": true,
+  "idleSilent": true,
+  "audioSourceCount": 1,
+  "playOneShotStarted": true,
+  "sourceOutputRms": 0.05899986,
+  "listenerOutputRms": 0.865902662,
+  "editorMuted": false,
+  "oneShotVolume": 0.35,
+  "sourceVolume": 1.0,
+  "spatialBlend": 1.0
+}

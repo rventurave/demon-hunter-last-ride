@@ -1,0 +1,75 @@
+{
+  "attachment": {
+    "initialPosition": "(-3.12, -0.01, -14.67)",
+    "states": [
+      "SelectAttachment",
+      "ChaseAttachment",
+      "Attach",
+      "Attached",
+      "Dead"
+    ],
+    "point": "LeftAttachPoint",
+    "localPosition": "(0.00, 0.00, 0.00)",
+    "followsCart": true,
+    "exclusiveReservations": true,
+    "attackCycles": 1
+  },
+  "sword": {
+    "attacks": 12,
+    "clips": [
+      "2",
+      "1",
+      "3",
+      "4",
+      "1",
+      "2",
+      "3",
+      "2",
+      "3",
+      "2",
+      "1",
+      "5"
+    ],
+    "healthBySwing": [
+      30.0,
+      18.0,
+      6.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "damageEvents": 3,
+    "dead": true,
+    "oneSoundPerSwing": true,
+    "oneHitPerVictimPerSwing": true,
+    "idleSilent": true,
+    "visualReaction": true,
+    "attackDurations": [
+      0.3164134,
+      0.3644457,
+      0.263484955,
+      0.27889967,
+      0.323884964,
+      0.2720747,
+      0.268444061,
+      0.319639683,
+      0.3143196,
+      0.272754669,
+      0.214410782,
+      0.271247864
+    ]
+  },
+  "deactivation": {
+    "cameraRemoved": true,
+    "weaponRestored": true,
+    "vrComponentStatesRestored": true,
+    "xrRigUnchanged": true
+  }
+}

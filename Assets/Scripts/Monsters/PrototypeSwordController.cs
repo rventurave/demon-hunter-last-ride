@@ -16,6 +16,16 @@ namespace JapaneseDemonHunter.Monsters
         private bool swinging;
         private float swingElapsed;
 
+        public bool IsSwinging => swinging;
+
+        public void ConfigureDesktopSwing(bool inputEnabled, Vector3 resting, Vector3 impact)
+        {
+            desktopInputEnabled = inputEnabled;
+            restingEuler = resting;
+            impactEuler = impact;
+            transform.localRotation = Quaternion.Euler(restingEuler);
+        }
+
         private void Awake()
         {
             if (swordDamage == null)

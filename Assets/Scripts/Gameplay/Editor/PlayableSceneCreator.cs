@@ -89,9 +89,9 @@ namespace JapaneseDemonHunter.GameplayEditor
         private const float LanternFlameHeight = 0.52f;
         // Warm firelight rather than a lantern-white: the night is dark on purpose and these are candles.
         private static readonly Color LanternFlameColor = new Color(1f, 0.78f, 0.44f);
-        private const float LanternFrontIntensity = 6f;
+        private const float LanternFrontIntensity = 7f;
         private const float LanternFrontRange = 24f;
-        private const float LanternRearIntensity = 5f;
+        private const float LanternRearIntensity = 6f;
         private const float LanternRearRange = 22f;
         // The lamp's slow breathing: wide enough to notice, slow enough not to flicker.
         private const float LanternPulseAmplitude = 0.14f;
@@ -122,7 +122,7 @@ namespace JapaneseDemonHunter.GameplayEditor
         };
         // How far below the head the rein collar sits, so the rope meets the neck, not the muzzle.
         private const float ReinCollarDrop = 0.34f;
-        private const float KnifeTargetLength = 0.85f;
+        private const float KnifeTargetLength = 0.98f;
         private const float PunchDamage = 5f;
         private const float KnifeDamage = 12f;
         private const float SecondsBeforeFirstMonster = 38f;
@@ -296,7 +296,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             SetFloat(motor, "startingSpeed", HorseStartingSpeed);
             SetFloat(motor, "accelerationPerStroke", WhipAccelerationPerStroke);
             SetFloat(motor, "brakingPerPull", 0.9f);
-            SetFloat(motor, "coastingDeceleration", WhipCoastingDeceleration);
+            SetFloat(motor, "decelerationRate", WhipCoastingDeceleration);
             WireGestureAudio(vehicleRoot.transform, motor);
 
             DisableDetachedWhipHandles(vehicleRoot.transform);
@@ -508,7 +508,7 @@ namespace JapaneseDemonHunter.GameplayEditor
         {
             RenderSettings.ambientMode = AmbientMode.Flat;
             // Barely any ambient at all: away from a lantern everything falls to near black.
-            RenderSettings.ambientLight = new Color(0.006f, 0.007f, 0.008f);
+            RenderSettings.ambientLight = new Color(0.012f, 0.014f, 0.016f);
             RenderSettings.skybox = nightSky;
             // No distance fog: the night is carried by the almost-black ambient and the lanterns, and
             // any haze over the road only hid the forest the player is riding through.
@@ -524,7 +524,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             // A paler, brighter looking moon whose light was turned down: the disk in the sky reads
             // brighter while the ground it touches stays properly dark.
             moon.color = new Color(0.62f, 0.68f, 0.86f);
-            moon.intensity = 0.34f;
+            moon.intensity = 0.4f;
             moon.shadows = LightShadows.Soft;
             RenderSettings.sun = moon;
         }
@@ -2018,7 +2018,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             bool rightGripReady = true;
             DisableDetachedWhipHandles(vehicleRootObject.transform);
             SetFloat(motor, "accelerationPerStroke", WhipAccelerationPerStroke);
-            SetFloat(motor, "coastingDeceleration", WhipCoastingDeceleration);
+            SetFloat(motor, "decelerationRate", WhipCoastingDeceleration);
 
             MonsterSpawner spawner = Object.FindAnyObjectByType<MonsterSpawner>();
             if (spawner != null)
@@ -2040,7 +2040,7 @@ namespace JapaneseDemonHunter.GameplayEditor
                 $"Rienda continua configurada en {ScenePath}; mangos izquierdo/derecho: " +
                 $"{leftGripReady}/{rightGripReady}; látigos separados desactivados, " +
                 $"gallop acceleration = {WhipAccelerationPerStroke}, " +
-                $"coastingDeceleration = {WhipCoastingDeceleration}.\n{validation}";
+                $"decelerationRate = {WhipCoastingDeceleration}.\n{validation}";
             return valid && leftGripReady && rightGripReady;
         }
 
@@ -2124,8 +2124,8 @@ namespace JapaneseDemonHunter.GameplayEditor
 
             GameObject rig = (GameObject)PrefabUtility.InstantiatePrefab(rigPrefab, vehicleRoot);
             rig.name = "OVRCameraRig";
-            // Seated a little forward of the cart's centre so the hunter is not at the very back of the bed.
-            rig.transform.localPosition = new Vector3(0f, 0.695f, -0.6f);
+            // The floor origin belongs on the bed; the tracked HMD supplies the player's eye height.
+            rig.transform.localPosition = new Vector3(0f, GetWagonBedFloorLocalY(vehicleRoot), -0.6f);
             rig.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
 
             ConfigureOvrManager(rig);
@@ -2230,11 +2230,10 @@ namespace JapaneseDemonHunter.GameplayEditor
 
         private static void CreateKnife(Transform vehicleRoot)
         {
-            // Resting on the bed, just ahead and to the right of where the hunter stands. The old
-            // fixed height was below the real wagon's floor once it was fitted, so the knife sat
-            // buried inside the boards and read as missing.
+            // The existing carried rest height keeps the weapon at hand level, ahead and to the
+            // right of the initial floor origin. No tracked hand or SDK attach pose is offset.
             float bedFloor = GetWagonBedFloorLocalY(vehicleRoot);
-            var restPosition = new Vector3(0.55f, bedFloor + 0.07f, -0.45f);
+            var restPosition = new Vector3(0.45f, bedFloor + 0.75f, -0.95f);
             GameObject knife = InstantiatePrefab(RopeProxyPrefabPath, vehicleRoot, restPosition);
             knife.name = "Knife";
             // The rope grip prefab is squashed (0.04, 0.2, 0.04), which would distort any model
@@ -2257,9 +2256,9 @@ namespace JapaneseDemonHunter.GameplayEditor
             if (capsule != null)
             {
                 capsule.radius = 0.05f;
-                capsule.height = 0.8f;
+                capsule.height = KnifeTargetLength;
                 capsule.direction = 2;
-                capsule.center = new Vector3(0f, 0f, 0.1f);
+                capsule.center = new Vector3(0f, 0f, 0.2f);
             }
 
             MeshCollider ropeHull = knife.GetComponent<MeshCollider>();
@@ -2268,7 +2267,7 @@ namespace JapaneseDemonHunter.GameplayEditor
                 ropeHull.enabled = false;
             }
 
-            Transform bladeTip = CreateChild(knife.transform, "BladeTip", new Vector3(0f, 0f, 0.58f));
+            Transform bladeTip = CreateChild(knife.transform, "BladeTip", new Vector3(0f, 0f, 0.2f + KnifeTargetLength * 0.5f));
             GameObject knifeModel = AssetDatabase.LoadAssetAtPath<GameObject>(KnifeModelPath);
             if (knifeModel != null)
             {
@@ -2318,6 +2317,7 @@ namespace JapaneseDemonHunter.GameplayEditor
                 damage,
                 vehicleRoot,
                 knife.transform.localPosition.y);
+            RequestedFeaturesSetup.SetupSwordAudio(knife);
         }
 
         // ---------------------------------------------------------------- monsters
@@ -2348,6 +2348,7 @@ namespace JapaneseDemonHunter.GameplayEditor
 
             CartAttachmentPoints attachmentPoints = systemObject.AddComponent<CartAttachmentPoints>();
             attachmentPoints.Configure(CreateAttachmentPoints(vehicleRoot));
+            SetBool(attachmentPoints, "rearPointsOnly", false);
 
             CartMonsterLoad cartLoad = systemObject.AddComponent<CartMonsterLoad>();
             cartLoad.Configure(60f, 0.3f, vehicleRoot.GetComponent<CarriageMotor>());
@@ -2363,6 +2364,7 @@ namespace JapaneseDemonHunter.GameplayEditor
                     {
                         prefab = AssetDatabase.LoadAssetAtPath<GameObject>(ZombiePrefabPath),
                         movementType = MonsterMovementType.Ground,
+                        spawnDirection = MonsterSpawnDirection.FrontDispersed,
                         weight = 1f,
                         attachmentLoad = 15f,
                         overrideTargetStrategy = true,
@@ -2397,8 +2399,8 @@ namespace JapaneseDemonHunter.GameplayEditor
             // The delay starts only after the first valid two-handed gallop.
             spawner.ConfigureFirstGallopSource(vehicleRoot.GetComponent<CarriageMotor>());
             spawner.ConfigureTiming(false, SecondsBeforeFirstMonster, MonsterSpawnInterval, true);
-            // A permanent horde behind the cart, of which only a few run fast enough to catch it.
-            spawner.ConfigureHorde(MinimumHordeSize, FastHordeFraction, FastHordeSpeedMultiplier);
+            // This scene uses front-dispersed zombies; retain the optional rear horde for other scenes.
+            spawner.ConfigureHorde(0, FastHordeFraction, FastHordeSpeedMultiplier);
             SetInt(spawner, "maximumActiveMonsters", MinimumHordeSize + BatRoundSize + 1);
 
             GiantZombieSpawner giantSpawner = systemObject.AddComponent<GiantZombieSpawner>();
@@ -2423,19 +2425,31 @@ namespace JapaneseDemonHunter.GameplayEditor
 
         private static List<MonsterAttachmentPoint> CreateAttachmentPoints(Transform vehicleRoot)
         {
-            // The points used to be pinned to the block prototype's rear, which ended up inside the
-            // real wagon once it was fitted: attached monsters walked into the cart and jammed there.
-            // They are placed relative to the wagon's own rear edge so any change of size still
-            // leaves them hanging behind the carriage.
+            // Five distinct ground slots around the fitted wagon, with one occupant per slot.
+            // Their low root height places the existing zombie mesh beside the wheels.
             float rearZ = GetCartRearLocalZ(vehicleRoot);
+            GameObject wagon = GameObject.Find("Wagon_Model");
+            float halfWidth = wagon != null && TryGetRendererBounds(wagon, out Bounds wagonBounds)
+                ? wagonBounds.extents.x : 2.13f;
+            float height = 0.15f;
 
             var points = new List<MonsterAttachmentPoint>();
-            points.Add(CreateAttachmentPoint(vehicleRoot, "Attach_RearCenter",
-                new Vector3(0f, 1.10f, rearZ + 1.05f), MonsterAttachmentKind.Ground, 2));
-            points.Add(CreateAttachmentPoint(vehicleRoot, "Attach_LeftRear",
-                new Vector3(-1.60f, 1.00f, rearZ + 0.65f), MonsterAttachmentKind.Ground, 1));
-            points.Add(CreateAttachmentPoint(vehicleRoot, "Attach_RightRear",
-                new Vector3(1.60f, 1.00f, rearZ + 0.65f), MonsterAttachmentKind.Ground, 1));
+            points.Add(CreateAttachmentPoint(vehicleRoot, "RearCenterAttachPoint",
+                new Vector3(0f, height, rearZ + 0.45f), MonsterAttachmentKind.Ground, 1));
+            points.Add(CreateAttachmentPoint(vehicleRoot, "RearLeftAttachPoint",
+                new Vector3(-halfWidth + 0.45f, height, rearZ + 0.45f), MonsterAttachmentKind.Ground, 1));
+            points.Add(CreateAttachmentPoint(vehicleRoot, "RearRightAttachPoint",
+                new Vector3(halfWidth - 0.45f, height, rearZ + 0.45f), MonsterAttachmentKind.Ground, 1));
+            points.Add(CreateAttachmentPoint(vehicleRoot, "LeftAttachPoint",
+                new Vector3(-halfWidth - 0.45f, height, rearZ - 1.5f), MonsterAttachmentKind.Ground, 1));
+            points.Add(CreateAttachmentPoint(vehicleRoot, "RightAttachPoint",
+                new Vector3(halfWidth + 0.45f, height, rearZ - 1.5f), MonsterAttachmentKind.Ground, 1));
+            foreach (MonsterAttachmentPoint point in points)
+            {
+                Vector3 inward = -point.transform.localPosition;
+                inward.y = 0f;
+                point.Configure(MonsterAttachmentKind.Ground, 1, inward);
+            }
             points.Add(CreateAttachmentPoint(vehicleRoot, "Attach_LeftRearFlying",
                 new Vector3(-1.85f, 1.75f, rearZ + 0.95f), MonsterAttachmentKind.Flying, 1));
             points.Add(CreateAttachmentPoint(vehicleRoot, "Attach_RightRearFlying",
@@ -2468,7 +2482,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             GameObject wagon = GameObject.Find("Wagon_Model");
             if (wagon != null && TryGetRendererBounds(wagon, out Bounds bed))
             {
-                return (bed.max.y - vehicleRoot.position.y) * 0.5f;
+                return vehicleRoot.InverseTransformPoint(bed.center).y;
             }
 
             return 0.62f;

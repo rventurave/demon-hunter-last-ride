@@ -9,7 +9,8 @@ namespace JapaneseDemonHunter.Monsters
     public enum MonsterSpawnDirection
     {
         Rear,
-        FrontLane
+        FrontLane,
+        FrontDispersed
     }
 
     [Serializable]
@@ -78,6 +79,7 @@ namespace JapaneseDemonHunter.Monsters
         [SerializeField] private LayerMask obstacleMask = ~0;
         [SerializeField, Min(1f)] private float maximumDespawnDistance = 90f;
         [SerializeField, Range(5f, 80f)] private float rearSpawnHalfAngle = 48f;
+        [SerializeField, Range(1f, 45f)] private float frontSpawnHalfAngle = 12f;
         [SerializeField, Min(0.1f)] private float frontLaneSpacing = 2.8f;
 
         private readonly HashSet<MonsterBase> activeMonsters = new HashSet<MonsterBase>();
@@ -253,7 +255,7 @@ namespace JapaneseDemonHunter.Monsters
             foreach (MonsterSpawnEntry entry in spawnEntries)
             {
                 if (entry == null || entry.prefab == null ||
-                    entry.spawnDirection == MonsterSpawnDirection.FrontLane)
+                    entry.spawnDirection != MonsterSpawnDirection.Rear)
                 {
                     continue;
                 }
@@ -284,6 +286,19 @@ namespace JapaneseDemonHunter.Monsters
 
             return SpawnAtPosition(entry, position, frontLaneIndex) != null;
         }
+
+#if UNITY_EDITOR
+        public void NotifyDebugFirstGallop() => HandleFirstGallop();
+
+        /// <summary>Debug placement through the same terrain checks, capacity and initialization as normal spawning.</summary>
+        public bool TrySpawnAtAngle(MonsterSpawnEntry entry, float angleDegrees, float radius)
+        {
+            if (!IsConfigured || activeMonsters.Count >= maximumActiveMonsters || entry == null ||
+                entry.prefab == null || !TryValidatePositionAtAngle(entry.movementType, angleDegrees,
+                    radius, out Vector3 position)) return false;
+            return SpawnAtPosition(entry, position, 0) != null;
+        }
+#endif
 
         public bool TrySpawnFaceThreatRound(int count)
         {
@@ -337,7 +352,7 @@ namespace JapaneseDemonHunter.Monsters
             monster.name = entry.prefab.name;
             monster.BecameInactive += HandleMonsterInactive;
             activeMonsters.Add(monster);
-            if (entry.spawnDirection != MonsterSpawnDirection.FrontLane)
+            if (entry.spawnDirection == MonsterSpawnDirection.Rear)
             {
                 rearMonsters.Add(monster);
                 monster.SpeedMultiplier = HordeModel.SpeedMultiplierFor(
@@ -355,6 +370,8 @@ namespace JapaneseDemonHunter.Monsters
             monster.ConfigureSpawnDirection(entry.spawnDirection, frontLaneIndex);
             monster.ConfigureFaceThreatSpawn(entry.isFaceThreat);
             monster.ConfigureAttachmentEnabled(entry.spawnDirection != MonsterSpawnDirection.FrontLane);
+            if (entry.spawnDirection == MonsterSpawnDirection.FrontDispersed)
+                monster.SpeedMultiplier = entry.speedMultiplier;
             MonsterAttachment spawnedAttachment = monster.GetComponent<MonsterAttachment>();
             if (spawnedAttachment != null && entry.attachmentLoad > 0f)
             {
@@ -418,7 +435,9 @@ namespace JapaneseDemonHunter.Monsters
             float entryMaximumRadius = entry.maximumRadius > 0f ? entry.maximumRadius : maximumRadius;
             for (int attempt = 0; attempt < maximumPlacementAttempts; attempt++)
             {
-                float angle = UnityEngine.Random.Range(-rearSpawnHalfAngle, rearSpawnHalfAngle);
+                float angle = entry.spawnDirection == MonsterSpawnDirection.FrontDispersed
+                    ? 180f + UnityEngine.Random.Range(-frontSpawnHalfAngle, frontSpawnHalfAngle)
+                    : UnityEngine.Random.Range(-rearSpawnHalfAngle, rearSpawnHalfAngle);
                 float radius = UnityEngine.Random.Range(entryMinimumRadius, Mathf.Max(entryMinimumRadius, entryMaximumRadius));
                 if (TryValidatePositionAtAngle(entry.movementType, angle, radius, out position,
                         entry.minimumFlyingHeight, entry.maximumFlyingHeight))

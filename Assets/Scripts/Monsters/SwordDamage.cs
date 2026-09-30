@@ -149,7 +149,7 @@ namespace JapaneseDemonHunter.Monsters
         private Vector3 TipPosition => sweepTip != null ? sweepTip.position : transform.position;
 
         private Vector3 RelativeTipPosition => velocityReference != null
-            ? TipPosition - velocityReference.position
+            ? velocityReference.InverseTransformPoint(TipPosition)
             : TipPosition;
 
         private void OpenNewWindow()

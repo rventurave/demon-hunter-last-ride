@@ -10,6 +10,8 @@ namespace JapaneseDemonHunter.Monsters
         [SerializeField, Min(0f)] private float impactDelay = 0.45f;
         [SerializeField, Min(0f)] private float cooldown = 2.5f;
         [SerializeField, Range(0.5f, 2f)] private float attackAnimationSpeed = 1f;
+        [Tooltip("Play the existing bite animation while attached even when the hunter is outside damage range.")]
+        [SerializeField] private bool animateOutsideAttackRange = true;
         [SerializeField] private LayerMask obstructionMask = ~0;
 
         private MonsterBase owner;
@@ -23,6 +25,7 @@ namespace JapaneseDemonHunter.Monsters
         public bool IsPreparingAttack => pending;
         public int ResolvedAttackCount { get; private set; }
         public int SuccessfulAttackCount { get; private set; }
+        public int AnimationCycleCount { get; private set; }
         public float ImpactDelay => impactDelay;
         public float Cooldown => cooldown;
         public float AttackAnimationSpeed => attackAnimationSpeed;
@@ -48,11 +51,23 @@ namespace JapaneseDemonHunter.Monsters
 
             if (!pending)
             {
-                if (currentTime >= nextAttackAt && IsHunterInRange())
+                if (currentTime >= nextAttackAt)
                 {
-                    pending = true;
-                    impactAt = currentTime + impactDelay;
-                    animationController?.PlayAttack(attackAnimationSpeed);
+                    bool inRange = IsHunterInRange();
+                    if (inRange || animateOutsideAttackRange)
+                    {
+                        animationController?.PlayAttack(attackAnimationSpeed);
+                        AnimationCycleCount++;
+                    }
+                    if (inRange)
+                    {
+                        pending = true;
+                        impactAt = currentTime + impactDelay;
+                    }
+                    else if (animateOutsideAttackRange)
+                    {
+                        nextAttackAt = currentTime + cooldown;
+                    }
                 }
                 return;
             }
@@ -70,7 +85,7 @@ namespace JapaneseDemonHunter.Monsters
             {
                 SuccessfulAttackCount++;
             }
-            animationController?.PlayLocomotion();
+            if (!animateOutsideAttackRange) animationController?.PlayLocomotion();
             ThreatResolved?.Invoke(owner, hit);
         }
 
@@ -88,6 +103,7 @@ namespace JapaneseDemonHunter.Monsters
             nextAttackAt = 0f;
             ResolvedAttackCount = 0;
             SuccessfulAttackCount = 0;
+            AnimationCycleCount = 0;
         }
 
         public void CancelAttack()

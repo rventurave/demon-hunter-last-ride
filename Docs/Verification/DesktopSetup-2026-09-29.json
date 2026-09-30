@@ -1,0 +1,48 @@
+﻿{
+  "diagnostics": [],
+  "compileMs": 152,
+  "executeMs": 9,
+  "assemblyName": "PipelineRunScript_InspectDesktopSetup_e93841e91d584ded9a189587b487d5d8",
+  "success": true,
+  "result": {
+    "debugComponents": 1,
+    "debugEnabled": true,
+    "xrInitOnStart": true,
+    "xrSettingsAsset": "Assets/XR/XRGeneralSettingsPerBuildTarget.asset",
+    "points": [
+      {
+        "name": "RearCenterAttachPoint",
+        "Capacity": 1,
+        "position": "(0.00, 0.15, 2.19)"
+      },
+      {
+        "name": "RearLeftAttachPoint",
+        "Capacity": 1,
+        "position": "(-0.99, 0.15, 2.19)"
+      },
+      {
+        "name": "RearRightAttachPoint",
+        "Capacity": 1,
+        "position": "(0.99, 0.15, 2.19)"
+      },
+      {
+        "name": "LeftAttachPoint",
+        "Capacity": 1,
+        "position": "(-1.89, 0.15, 0.24)"
+      },
+      {
+        "name": "RightAttachPoint",
+        "Capacity": 1,
+        "position": "(1.89, 0.15, 0.24)"
+      }
+    ],
+    "clips": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "runtimeObjectsInEdit": 0
+  }
+}

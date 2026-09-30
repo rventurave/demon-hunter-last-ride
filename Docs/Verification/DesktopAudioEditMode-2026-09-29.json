@@ -1,0 +1,41 @@
+﻿{
+  "status": "completed",
+  "duration": 0.13,
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "JapaneseDemonHunter.Gameplay.Tests.SwordSwingAudioTests.AttackWindowProducesOneSoundDespiteRepeatedBeginsAndSweeps",
+      "Status": "Passed",
+      "Duration": 0.032151,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "JapaneseDemonHunter.Gameplay.Tests.SwordSwingAudioTests.ConsecutiveWindowsNeverRepeatThePreviousClip",
+      "Status": "Passed",
+      "Duration": 0.0191402,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "JapaneseDemonHunter.Gameplay.Tests.SwordSwingAudioTests.HoldingWeaponDuringCartTranslationAndRotationDoesNotOpenWindow",
+      "Status": "Passed",
+      "Duration": 0.0019496,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "JapaneseDemonHunter.Gameplay.Tests.SwordSwingAudioTests.NullAndUnassignedClipsAreSafeAndOneAvailableClipCanRepeat",
+      "Status": "Passed",
+      "Duration": 0.0028392,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}
