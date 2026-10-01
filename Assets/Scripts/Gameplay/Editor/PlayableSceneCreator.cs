@@ -123,7 +123,7 @@ namespace JapaneseDemonHunter.GameplayEditor
         // How far below the head the rein collar sits, so the rope meets the neck, not the muzzle.
         private const float ReinCollarDrop = 0.34f;
         private const float KnifeTargetLength = 0.98f;
-        private const float PunchDamage = 5f;
+        private const float PunchDamage = 8f;
         private const float KnifeDamage = 12f;
         private const float SecondsBeforeFirstMonster = 38f;
         private const float MonsterSpawnInterval = 11f;
@@ -967,8 +967,8 @@ namespace JapaneseDemonHunter.GameplayEditor
 
             ReinHandle rein = handle.AddComponent<ReinHandle>();
             SetInt(rein, "expectedHand", handedness);
-            SetBool(rein, "requireExpectedHand", true);
-            SetBool(rein, "enableLaneGesture", false);
+            SetBool(rein, "requireExpectedHand", false);
+            SetBool(rein, "enableLaneGesture", true);
             SetVector3(rein, "restLocalPosition", restLocalPosition);
             // The root is the grabbable, so the rope never depends on a child proxy transform.
             SetObjectArray(rein, "grabPoints", rootGrabPoint != null
@@ -1514,7 +1514,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             var reinProperties = new SerializedObject(rein);
             reinProperties.Update();
             SetSerializedInt(reinProperties, "expectedHand", (int)expectedHand);
-            SetSerializedBool(reinProperties, "requireExpectedHand", true);
+            SetSerializedBool(reinProperties, "requireExpectedHand", false);
             SerializedProperty legacyZone = reinProperties.FindProperty("interactable");
             if (legacyZone != null)
             {
@@ -1919,7 +1919,7 @@ namespace JapaneseDemonHunter.GameplayEditor
             var serialized = new SerializedObject(plan.rein);
             serialized.Update();
             SetSerializedInt(serialized, "expectedHand", (int)expectedHand);
-            SetSerializedBool(serialized, "requireExpectedHand", true);
+            SetSerializedBool(serialized, "requireExpectedHand", false);
             SerializedProperty legacy = serialized.FindProperty("interactable");
             if (legacy != null)
             {
@@ -2225,15 +2225,16 @@ namespace JapaneseDemonHunter.GameplayEditor
             }
 
             strikes.Configure(vehicleRoot, PunchDamage, 0.16f, 2f, ~0);
+            WireObject(strikes,"handHitClip",LoadAudio("golpe.mp3"));
             CreateKnife(vehicleRoot);
         }
 
         private static void CreateKnife(Transform vehicleRoot)
         {
-            // The existing carried rest height keeps the weapon at hand level, ahead and to the
-            // right of the initial floor origin. No tracked hand or SDK attach pose is offset.
+            // Rest just above the deck, to the player's right and away from the rein grips.
+            // No tracked hand or SDK attach pose is offset.
             float bedFloor = GetWagonBedFloorLocalY(vehicleRoot);
-            var restPosition = new Vector3(0.45f, bedFloor + 0.75f, -0.95f);
+            var restPosition = new Vector3(0.55f, bedFloor + 0.075f, -0.25f);
             GameObject knife = InstantiatePrefab(RopeProxyPrefabPath, vehicleRoot, restPosition);
             knife.name = "Knife";
             // The rope grip prefab is squashed (0.04, 0.2, 0.04), which would distort any model
@@ -2318,6 +2319,9 @@ namespace JapaneseDemonHunter.GameplayEditor
                 vehicleRoot,
                 knife.transform.localPosition.y);
             RequestedFeaturesSetup.SetupSwordAudio(knife);
+            Transform recoveryPoint = CreateChild(vehicleRoot, "SwordRespawnPoint", knife.transform.localPosition);
+            weapon.ConfigureRecovery(recoveryPoint, new Vector3(0f, bedFloor + 0.9f, 0f),
+                new Vector3(2.2f, 1.15f, 3.2f));
         }
 
         // ---------------------------------------------------------------- monsters

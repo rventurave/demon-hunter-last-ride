@@ -63,6 +63,8 @@ namespace Reins
         private int _lane;
         private bool _firstGallopRaised;
         private bool _inputBlocked;
+        private bool _travelPaused;
+        public bool IsTravelPaused => _travelPaused;
         private CartHitPenaltyModel _hitPenalty;
 
         public bool IsInputBlocked => _inputBlocked;
@@ -79,7 +81,7 @@ namespace Reins
                                        accelerateClip != null &&
                                        brakeClip != null;
 
-        public float EffectiveSpeed => LoadModel.EffectiveSpeed;
+        public float EffectiveSpeed => _travelPaused ? 0f : LoadModel.EffectiveSpeed;
         public float SpeedMultiplier => LoadModel.SpeedMultiplier;
         public float EffectiveMaximumSpeed => LoadModel.EffectiveMaximumSpeed;
 
@@ -124,9 +126,15 @@ namespace Reins
         private void Update()
         {
             var deltaTime = Time.deltaTime;
-            HitPenalty.Tick(deltaTime, hitPenaltyRecoverySeconds);
             leftRein?.UpdateGrip(deltaTime);
             rightRein?.UpdateGrip(deltaTime);
+            if (_travelPaused)
+            {
+                _reinGestures.Step(false,false,Vector3.zero,Vector3.zero,deltaTime);
+                LastCommand = ReinGestureKind.None;
+                return;
+            }
+            HitPenalty.Tick(deltaTime, hitPenaltyRecoverySeconds);
             if (_inputBlocked)
             {
                 _reinGestures.Step(false, false, Vector3.zero, Vector3.zero, deltaTime);
@@ -215,10 +223,13 @@ namespace Reins
             _inputBlocked = blocked;
         }
 
+        /// <summary>Session pause preserves the original starting speed, acceleration and XR pose.</summary>
+        public void SetTravelPaused(bool paused) => _travelPaused = paused;
+
         /// <summary>Integration point for external systems that request a lash of the reins.</summary>
         public void RequestAcceleration()
         {
-            if (_inputBlocked)
+            if (_inputBlocked || _travelPaused)
             {
                 return;
             }

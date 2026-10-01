@@ -9,7 +9,7 @@ namespace JapaneseDemonHunter.Gameplay
     /// <summary>
     /// Real physics for the held weapon. Let go gently and it drops onto the carriage deck; release
     /// it while the hand is moving fast and it is thrown as a physical projectile that keeps dealing
-    /// damage in flight and then falls to the road, left behind by the carriage.
+    /// damage in flight. Outside the safe carriage zone it returns after a delay, only while released.
     /// </summary>
     [DefaultExecutionOrder(10000)]
     [DisallowMultipleComponent]
@@ -32,12 +32,22 @@ namespace JapaneseDemonHunter.Gameplay
         [Tooltip("How far above the deck the hand must be for a dropped weapon to be considered airborne.")]
         [SerializeField, Min(0f)] private float minimumDropHeight = 0.05f;
 
+        [Header("Recuperacion del arma")]
+        [SerializeField] private Transform swordRespawnPoint;
+        [Tooltip("Safe box in carriage-local space; held weapons are never recovered.")]
+        [SerializeField] private Vector3 swordSafeCenter = new Vector3(0f, 1f, 0f);
+        [SerializeField] private Vector3 swordSafeHalfExtents = new Vector3(2f, 1.5f, 3f);
+        [SerializeField, Min(0f)] private float swordRespawnDelay = 1.25f;
+
         private readonly List<IHand> hands = new List<IHand>();
         private Vector3 previousPosition;
         private Vector3 handVelocity;
         private float fallSpeed;
         private bool held;
         private bool thrown;
+        private float outsideSeconds;
+        public int RecoveryCount { get; private set; }
+        public event System.Action Grabbed;
 
         public bool IsHeld => held;
         public bool IsThrown => thrown;
@@ -98,6 +108,49 @@ namespace JapaneseDemonHunter.Gameplay
             {
                 TickDroppedFall(deltaTime);
             }
+            TickRecovery(deltaTime);
+        }
+
+        public bool IsInsideSafeZone(Vector3 worldPosition)
+        {
+            if (velocityReference == null) return true;
+            Vector3 offset = velocityReference.InverseTransformPoint(worldPosition) - swordSafeCenter;
+            return Mathf.Abs(offset.x) <= Mathf.Abs(swordSafeHalfExtents.x) &&
+                   Mathf.Abs(offset.y) <= Mathf.Abs(swordSafeHalfExtents.y) &&
+                   Mathf.Abs(offset.z) <= Mathf.Abs(swordSafeHalfExtents.z);
+        }
+
+        /// <summary>Recovery runs after release, never during any SDK selection (even tracking loss).</summary>
+        public void TickRecovery(float deltaTime)
+        {
+            if (swordRespawnPoint == null || velocityReference == null || held ||
+                IsGrabbedByAnyHand() || IsInsideSafeZone(transform.position))
+            {
+                outsideSeconds = 0f;
+                return;
+            }
+            outsideSeconds += Mathf.Max(0f, deltaTime);
+            if (outsideSeconds < swordRespawnDelay) return;
+            if (body != null && !body.isKinematic)
+            {
+                body.linearVelocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+            }
+            damage?.EndAttackWindow();
+            transform.SetParent(velocityReference, true);
+            transform.SetPositionAndRotation(swordRespawnPoint.position, swordRespawnPoint.rotation);
+            RestoreCarriedState();
+            previousPosition = transform.position;
+            handVelocity = Vector3.zero;
+            fallSpeed = outsideSeconds = 0f;
+            RecoveryCount++;
+        }
+
+        public void ConfigureRecovery(Transform point, Vector3 center, Vector3 halfExtents)
+        {
+            swordRespawnPoint = point;
+            swordSafeCenter = center;
+            swordSafeHalfExtents = halfExtents;
         }
 
         /// <summary>Let go without speed: the weapon drops onto the deck and stays aboard.</summary>
@@ -117,6 +170,7 @@ namespace JapaneseDemonHunter.Gameplay
 
         private void PickUp()
         {
+            if (held) return;
             held = true;
             thrown = false;
             fallSpeed = 0f;
@@ -139,6 +193,7 @@ namespace JapaneseDemonHunter.Gameplay
             {
                 damage.ConfigureVelocityReference(velocityReference);
             }
+            Grabbed?.Invoke();
         }
 
         private void Release()

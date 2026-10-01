@@ -15,12 +15,14 @@ namespace JapaneseDemonHunter.Monsters
         [SerializeField] private bool allowVelocityActivatedWindows = true;
         [SerializeField, Min(0.1f)] private float minimumSwingSpeed = 2.5f;
         [SerializeField, Min(0.02f)] private float velocityWindowGrace = 0.12f;
+        [SerializeField, Min(0f)] private float minimumWindowCooldown;
 
         private readonly HashSet<MonsterDamageable> hitThisWindow = new HashSet<MonsterDamageable>();
         private Vector3 previousWorldTipPosition;
         private Vector3 previousRelativeTipPosition;
         private bool explicitWindow;
         private float velocityWindowUntil;
+        private float nextVelocityWindow;
 
         public bool IsAttackWindowOpen => explicitWindow || Time.time < velocityWindowUntil;
         public int UniqueHitsThisWindow => hitThisWindow.Count;
@@ -35,6 +37,7 @@ namespace JapaneseDemonHunter.Monsters
             previousRelativeTipPosition = RelativeTipPosition;
             explicitWindow = false;
             velocityWindowUntil = 0f;
+            nextVelocityWindow = 0f;
             hitThisWindow.Clear();
         }
 
@@ -45,11 +48,13 @@ namespace JapaneseDemonHunter.Monsters
             float speed = (currentRelative - previousRelativeTipPosition).magnitude / Mathf.Max(Time.deltaTime, 0.0001f);
             if (allowVelocityActivatedWindows && speed >= minimumSwingSpeed)
             {
-                if (!IsAttackWindowOpen)
+                bool activeWindow = IsAttackWindowOpen;
+                if (!activeWindow && Time.time >= nextVelocityWindow)
                 {
                     OpenNewWindow();
+                    activeWindow = true;
                 }
-                velocityWindowUntil = Time.time + velocityWindowGrace;
+                if (activeWindow) velocityWindowUntil = Time.time + velocityWindowGrace;
             }
 
             if (IsAttackWindowOpen)
@@ -135,6 +140,8 @@ namespace JapaneseDemonHunter.Monsters
             velocityWindowGrace = Mathf.Max(0.02f, grace);
         }
 
+        public void ConfigureWindowCooldown(float seconds) => minimumWindowCooldown = Mathf.Max(0f, seconds);
+
         /// <summary>
         /// The reference whose motion must be ignored when measuring swing speed. A sword carried by
         /// a moving cart would otherwise always look like it is being swung.
@@ -154,6 +161,7 @@ namespace JapaneseDemonHunter.Monsters
 
         private void OpenNewWindow()
         {
+            nextVelocityWindow = Time.time + minimumWindowCooldown;
             hitThisWindow.Clear();
             AttackWindowOpened?.Invoke();
         }

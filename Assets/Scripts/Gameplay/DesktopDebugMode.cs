@@ -97,6 +97,7 @@ namespace JapaneseDemonHunter.Gameplay
         public void SimulateLash()
         {
             if (!active || motor == null) return;
+            FindAnyObjectByType<GameSessionController>()?.TryStartFromGrip(true,true);
             ((ICartAccelerationRequester)motor).RequestAcceleration();
             // RequestAcceleration intentionally has no gesture event. Reuse the spawner's existing start gate.
             if (spawner.IsWaitingForFirstGallop) spawner.NotifyDebugFirstGallop();

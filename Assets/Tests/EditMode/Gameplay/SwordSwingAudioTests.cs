@@ -14,6 +14,9 @@ namespace JapaneseDemonHunter.Gameplay.Tests
         private AudioSource source;
         private SwordSwingAudio feedback;
         private AudioClip[] clips;
+        private GameObject victim;
+        private MonsterDamageable health;
+        private Vector3 contact;
 
         [SetUp]
         public void SetUp()
@@ -27,23 +30,34 @@ namespace JapaneseDemonHunter.Gameplay.Tests
                 AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Art/Audio/swordSound/{index}.wav")).ToArray();
             Assert.That(clips.All(clip => clip != null), Is.True, "All five original sound extracts must import.");
             feedback.Configure(damage, source, clips);
+            victim = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Monsters/Zombie/Prefabs/ZombieDemon.prefab"));
+            victim.transform.position = new Vector3(10000f,0f,0f);
+            health = victim.GetComponent<MonsterDamageable>();
+            typeof(MonsterDamageable).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(health,null);
+            health.Configure(10000f,true);
+            damage.Configure(weapon.transform,12f,.25f,~0);
+            contact = victim.transform.position + Vector3.up;
+            Physics.SyncTransforms();
         }
 
         [TearDown]
-        public void TearDown() => Object.DestroyImmediate(weapon);
+        public void TearDown() { Object.DestroyImmediate(weapon); Object.DestroyImmediate(victim); }
 
         [Test]
-        public void AttackWindowProducesOneSoundDespiteRepeatedBeginsAndSweeps()
+        public void AirIsSilentAndRealDamageProducesOneSoundDespiteRepeatedContacts()
         {
             damage.BeginAttackWindow();
+            damage.Sweep(Vector3.zero,Vector3.zero);
+            Assert.That(feedback.PlayedSoundCount, Is.Zero);
             for (int i = 0; i < 10; i++)
             {
                 damage.BeginAttackWindow();
-                damage.Sweep(Vector3.zero, Vector3.zero);
+                damage.Sweep(contact, contact);
             }
             Assert.That(feedback.PlayedSoundCount, Is.EqualTo(1));
             damage.EndAttackWindow();
             damage.BeginAttackWindow();
+            damage.Sweep(contact,contact);
             Assert.That(feedback.PlayedSoundCount, Is.EqualTo(2));
             Assert.That(weapon.GetComponents<AudioSource>().Length, Is.EqualTo(1));
         }
@@ -55,9 +69,11 @@ namespace JapaneseDemonHunter.Gameplay.Tests
             for (int i = 0; i < 50; i++)
             {
                 damage.BeginAttackWindow();
+                damage.Sweep(contact,contact);
                 Assert.That(feedback.LastPlayedClip, Is.Not.Null);
                 Assert.That(feedback.LastPlayedClip, Is.Not.SameAs(previous));
                 Assert.That(clips, Does.Contain(feedback.LastPlayedClip));
+                Assert.That(feedback.LastPlayedClip.name, Is.Not.EqualTo("5"));
                 previous = feedback.LastPlayedClip;
                 damage.EndAttackWindow();
             }
@@ -71,16 +87,19 @@ namespace JapaneseDemonHunter.Gameplay.Tests
             for (int i = 0; i < 10; i++)
             {
                 damage.BeginAttackWindow();
+                damage.Sweep(contact,contact);
                 Assert.That(feedback.LastPlayedClip, Is.SameAs(clips[2]));
                 damage.EndAttackWindow();
             }
             int played = feedback.PlayedSoundCount;
             feedback.Configure(damage, source, new AudioClip[5]);
             Assert.DoesNotThrow(() => damage.BeginAttackWindow());
+            Assert.DoesNotThrow(() => damage.Sweep(contact,contact));
             Assert.That(feedback.PlayedSoundCount, Is.EqualTo(played));
             damage.EndAttackWindow();
             feedback.Configure(damage, source, null);
             Assert.DoesNotThrow(() => damage.BeginAttackWindow());
+            Assert.DoesNotThrow(() => damage.Sweep(contact,contact));
             Assert.That(feedback.PlayedSoundCount, Is.EqualTo(played));
         }
 

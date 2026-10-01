@@ -17,12 +17,17 @@ namespace JapaneseDemonHunter.Gameplay
         private const int MaximumDiscoveryAttempts = 10;
 
         [SerializeField] private Transform cartRoot;
-        [SerializeField, Min(0.01f)] private float punchDamage = 5f;
+        [SerializeField, Min(0.01f)] private float punchDamage = 8f;
         [SerializeField, Min(0.01f)] private float sweepRadius = 0.14f;
         [SerializeField, Min(0.1f)] private float minimumSwingSpeed = 2f;
         [SerializeField, Min(0.02f)] private float velocityWindowGrace = 0.12f;
         [SerializeField] private LayerMask targetMask = ~0;
         [SerializeField] private bool logWhenNoHandsAreFound = true;
+        [SerializeField, Min(0f)] private float handHitCooldown = 0.35f;
+        [SerializeField] private AudioClip handHitClip;
+        [SerializeField] private AudioSource handHitAudioSource;
+        [SerializeField, Range(0f,1f)] private float handHitVolume = 0.5f;
+        public int PlayedHitSoundCount { get; private set; }
 
         private readonly List<HandStrike> strikes = new List<HandStrike>();
         private readonly List<GameObject> createdTips = new List<GameObject>();
@@ -37,10 +42,21 @@ namespace JapaneseDemonHunter.Gameplay
         {
             public IHand hand;
             public Transform tip;
+            public SwordDamage sweep;
+            public bool playedSound;
         }
 
         private void Start()
         {
+            if (handHitAudioSource == null && handHitClip != null)
+            {
+                handHitAudioSource = gameObject.AddComponent<AudioSource>();
+                handHitAudioSource.playOnAwake = false;
+                handHitAudioSource.spatialBlend = 1f;
+                handHitAudioSource.minDistance = .5f;
+                handHitAudioSource.maxDistance = 10f;
+                handHitAudioSource.dopplerLevel = 0f;
+            }
             DiscoverHands();
         }
 
@@ -60,10 +76,15 @@ namespace JapaneseDemonHunter.Gameplay
                     continue;
                 }
 
-                if (strike.hand.GetJointPose(HandJointId.HandMiddleTip, out var pose))
+                Pose pose = default;
+                bool valid = strike.hand.IsConnected && strike.hand.IsTrackedDataValid &&
+                    strike.hand.GetJointPose(HandJointId.HandMiddleTip, out pose);
+                if (valid)
                 {
                     strike.tip.position = pose.position;
+                    strike.sweep.enabled = true;
                 }
+                else strike.sweep.enabled = false;
             }
         }
 
@@ -100,12 +121,27 @@ namespace JapaneseDemonHunter.Gameplay
 
                 var tip = new GameObject("PunchTip_" + hand.Handedness).transform;
                 tip.SetParent(interactor.transform, false);
+                var strike = new HandStrike { hand = hand, tip = tip };
                 var sweep = tip.gameObject.AddComponent<SwordDamage>();
-                sweep.Configure(tip, punchDamage, sweepRadius, targetMask);
-                sweep.ConfigureSwingWindows(true, minimumSwingSpeed, velocityWindowGrace);
-                sweep.ConfigureVelocityReference(cartRoot);
+                ConfigureStrikeSweep(sweep,tip);
+                strike.sweep = sweep;
+                sweep.enabled = false; // No damage before the first valid tracked pose.
+                sweep.AttackWindowOpened += () => strike.playedSound = false;
+                sweep.MonsterHit += monster =>
+                {
+                    if (strike.playedSound || monster.GetComponent<MonsterBase>()?.MovementType != MonsterMovementType.Ground) return;
+                    strike.playedSound = true;
+                    var feedback = monster.GetComponent<MonsterSwordHitFeedback>();
+                    if (feedback == null) feedback = monster.gameObject.AddComponent<MonsterSwordHitFeedback>();
+                    feedback.ShowHit();
+                    if (handHitClip != null && handHitAudioSource != null)
+                    {
+                        handHitAudioSource.PlayOneShot(handHitClip,handHitVolume);
+                        PlayedHitSoundCount++;
+                    }
+                };
                 createdTips.Add(tip.gameObject);
-                strikes.Add(new HandStrike { hand = hand, tip = tip });
+                strikes.Add(strike);
             }
 
             if (strikes.Count == 0 && discoveryAttempts >= MaximumDiscoveryAttempts && logWhenNoHandsAreFound)
@@ -129,6 +165,25 @@ namespace JapaneseDemonHunter.Gameplay
             sweepRadius = Mathf.Max(0.01f, radius);
             minimumSwingSpeed = Mathf.Max(0.1f, swingSpeed);
             targetMask = configuredTargetMask;
+        }
+
+        /// <summary>Uses the same damage windows as the sword, tuned for one tracked hand.</summary>
+        public void ConfigureStrikeSweep(SwordDamage sweep, Transform tip)
+        {
+            sweep.Configure(tip,punchDamage,sweepRadius,targetMask);
+            sweep.ConfigureSwingWindows(true,minimumSwingSpeed,velocityWindowGrace);
+            sweep.ConfigureWindowCooldown(handHitCooldown);
+            sweep.ConfigureVelocityReference(cartRoot);
+        }
+
+        private void OnDisable()
+        {
+            foreach (var strike in strikes) if (strike.sweep != null) strike.sweep.enabled=false;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var tip in createdTips) if (tip != null) Destroy(tip);
         }
 
         private bool HasHand(Handedness handedness)

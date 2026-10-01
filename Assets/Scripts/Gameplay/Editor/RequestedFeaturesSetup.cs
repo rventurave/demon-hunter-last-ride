@@ -113,7 +113,7 @@ namespace JapaneseDemonHunter.GameplayEditor
 
         public static void SetupSwordAudio(GameObject knife)
         {
-            AudioClip[] clips = Enumerable.Range(1, 5).Select(index =>
+            AudioClip[] clips = Enumerable.Range(1, 4).Select(index =>
                 AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Art/Audio/swordSound/{index}.wav")).ToArray();
             if (clips.Any(clip => clip == null)) throw new InvalidOperationException("Import all five extracted sword WAV clips first.");
             SwordSwingAudio feedback = knife.GetComponent<SwordSwingAudio>();
@@ -132,6 +132,8 @@ namespace JapaneseDemonHunter.GameplayEditor
             }
             feedback = Undo.AddComponent<SwordSwingAudio>(knife);
             feedback.Configure(knife.GetComponentInChildren<SwordDamage>(), source, clips);
+            feedback.ConfigureGrabAudio(knife.GetComponent<GrabbableWeapon>(),
+                AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Art/Audio/swordSound/5.wav"));
             EditorUtility.SetDirty(feedback);
         }
 

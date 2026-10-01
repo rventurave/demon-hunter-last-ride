@@ -1,0 +1,2 @@
+PASS: Desktop activation, XR central camera restoration, temporary camera cleanup and unchanged rig transform. XR restart requires stopping and restarting Play.
+PASS: saved OpenXR settings unchanged and Initialize XR on Startup restored after Desktop Debug Play session.

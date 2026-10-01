@@ -987,7 +987,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Reins::Reins.ReinHandle
   expectedHand: 1
-  requireExpectedHand: 1
+  requireExpectedHand: 0
   restLocalPosition: {x: 0.34, y: 1.2604986, z: -1}
   grabPoints:
   - {fileID: 128089567}
@@ -1000,7 +1000,7 @@ MonoBehaviour:
   brakeThreshold: 0.15
   enableBrakeGesture: 0
   laneThreshold: 0.18
-  enableLaneGesture: 0
+  enableLaneGesture: 1
   rearmRadius: 0.12
   gestureCooldown: 0.35
   liftWindow: 4
@@ -2374,7 +2374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Reins::Reins.ReinHandle
   expectedHand: 0
-  requireExpectedHand: 1
+  requireExpectedHand: 0
   restLocalPosition: {x: -0.34, y: 1.2604986, z: -1}
   grabPoints:
   - {fileID: 455967064}
@@ -2387,7 +2387,7 @@ MonoBehaviour:
   brakeThreshold: 0.15
   enableBrakeGesture: 0
   laneThreshold: 0.18
-  enableLaneGesture: 0
+  enableLaneGesture: 1
   rearmRadius: 0.12
   gestureCooldown: 0.35
   liftWindow: 4
@@ -2550,6 +2550,7 @@ GameObject:
   - component: {fileID: 505499163}
   - component: {fileID: 505499162}
   - component: {fileID: 505499161}
+  - component: {fileID: 505499169}
   m_Layer: 0
   m_Name: MonsterSystem
   m_TagString: Untagged
@@ -2783,6 +2784,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &505499169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 505499160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44dc7585305c4d24a827780c2e13f141, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: JapaneseDemonHunter.Gameplay::JapaneseDemonHunter.Gameplay.GameSessionController
+  playerHitPoints: 5
+  restartHoldSeconds: 1.5
+  waitForBothReins: 1
+  presentationEye: {fileID: 1928975910}
+  introDistance: 2.4
+  fallbackEyeHeight: 1.6
+  introTitleSize: 0.035
+  introInstructionSize: 0.032
+  resultLocalPosition: {x: 0, y: 2.4, z: -1.35}
+  resultDistance: 2.4
+  resultTitleSize: 0.065
+  restartInstructionSize: 0.025
 --- !u!1 &513553418
 GameObject:
   m_ObjectHideFlags: 0
@@ -3849,6 +3874,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 846519984}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &884537693
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 884537694}
+  m_Layer: 0
+  m_Name: SwordRespawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &884537694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 884537693}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.55, y: 0.63524926, z: -0.25000003}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1037195782}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &908023447
 GameObject:
   m_ObjectHideFlags: 0
@@ -4419,6 +4475,7 @@ Transform:
   - {fileID: 1415056009}
   - {fileID: 2089249355}
   - {fileID: 1829492985}
+  - {fileID: 884537694}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1037195783
@@ -4476,6 +4533,7 @@ MonoBehaviour:
   horseNeighClip: {fileID: 8300000, guid: 1469ed84b87b676468ac8074062a1b42, type: 3}
   zombieVoiceClip: {fileID: 8300000, guid: 8b39afc5b4efb3147b5d78a6470d1615, type: 3}
   zombieDeathClip: {fileID: 8300000, guid: b7267bacd3792f1418537e3f5be7866f, type: 3}
+  zombieDeathSoundVolume: 0.512
   batWingsClip: {fileID: 8300000, guid: ab537d10ee5f06a4fa351c982d10a980, type: 3}
   batDeathClip: {fileID: 8300000, guid: 19dc10a84dae87243aad512093b55eb2, type: 3}
   hitClip: {fileID: 8300000, guid: 82dcf2a43d6173f4489b10765d0e43ac, type: 3}
@@ -4502,7 +4560,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: JapaneseDemonHunter.Gameplay::JapaneseDemonHunter.Gameplay.HandStrikeController
   cartRoot: {fileID: 1037195782}
-  punchDamage: 5
+  punchDamage: 8
   sweepRadius: 0.16
   minimumSwingSpeed: 2
   velocityWindowGrace: 0.12
@@ -4510,6 +4568,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   logWhenNoHandsAreFound: 1
+  handHitCooldown: 0.35
+  handHitClip: {fileID: 8300000, guid: 82dcf2a43d6173f4489b10765d0e43ac, type: 3}
+  handHitAudioSource: {fileID: 1037195781}
+  handHitVolume: 0.5
 --- !u!1 &1037461680
 GameObject:
   m_ObjectHideFlags: 0
@@ -4976,15 +5038,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.45
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.3102493
+      value: 0.63524926
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.95000005
+      value: -0.25000003
       objectReference: {fileID: 0}
     - target: {fileID: 4252421029425046603, guid: 658245a04427ea7479977447eef58b8d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5104,9 +5166,13 @@ MonoBehaviour:
   velocityReference: {fileID: 1037195782}
   throwSpeed: 2.5
   fallAcceleration: 9.81
-  deckLocalHeight: 1.3102493
+  deckLocalHeight: 0.63524926
   throwSpin: 8
   minimumDropHeight: 0.05
+  swordRespawnPoint: {fileID: 884537694}
+  swordSafeCenter: {x: 0, y: 1.4602492, z: -0.30543613}
+  swordSafeHalfExtents: {x: 1.5896574, y: 1.15, z: 2.1945639}
+  swordRespawnDelay: 1.25
 --- !u!114 &1144258008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5121,12 +5187,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: JapaneseDemonHunter.Gameplay::JapaneseDemonHunter.Gameplay.SwordSwingAudio
   swordDamage: {fileID: 1500901369}
   audioSource: {fileID: 1144258009}
+  weapon: {fileID: 1144258002}
+  grabClip: {fileID: 8300000, guid: 99eaf7a8a3dd7b9499b54fdc509fd3f6, type: 3}
+  grabVolume: 0.35
   swordSounds:
   - {fileID: 8300000, guid: f7b63a386b20ebe4abb84275e6ee9d96, type: 3}
   - {fileID: 8300000, guid: 436706c1116e586499a9cf600a5574e0, type: 3}
   - {fileID: 8300000, guid: 4eebd5e474b828e44985571aa5e31258, type: 3}
   - {fileID: 8300000, guid: b2112ce59e011154ba0613ded669968a, type: 3}
-  - {fileID: 8300000, guid: 99eaf7a8a3dd7b9499b54fdc509fd3f6, type: 3}
   volume: 0.35
   avoidImmediateRepeat: 1
 --- !u!82 &1144258009
@@ -6826,6 +6894,7 @@ MonoBehaviour:
   allowVelocityActivatedWindows: 1
   minimumSwingSpeed: 2.2
   velocityWindowGrace: 0.14
+  minimumWindowCooldown: 0
 --- !u!1 &1520528847
 GameObject:
   m_ObjectHideFlags: 0

@@ -24,7 +24,7 @@ namespace JapaneseDemonHunter.Gameplay
         [Tooltip("Only this hand may drive the handle. Left handle -> Left, right handle -> Right.")]
         [SerializeField] private Handedness expectedHand = Handedness.Left;
         [Tooltip("Turn off to let either hand drive this handle while the grasp is being tuned.")]
-        [SerializeField] private bool requireExpectedHand = true;
+        [SerializeField] private bool requireExpectedHand;
 
         [Header("Integración con la carreta")]
         [Tooltip("Any component implementing ICartAccelerationRequester (the CarriageMotor on VehicleRoot).")]

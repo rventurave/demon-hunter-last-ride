@@ -18,6 +18,7 @@ namespace JapaneseDemonHunter.Gameplay
         [SerializeField] private AudioClip horseNeighClip;
         [SerializeField] private AudioClip zombieVoiceClip;
         [SerializeField] private AudioClip zombieDeathClip;
+        [SerializeField, Range(0f,1f)] private float zombieDeathSoundVolume = 0.512f;
         [SerializeField] private AudioClip batWingsClip;
         [SerializeField] private AudioClip batDeathClip;
         [SerializeField] private AudioClip hitClip;
@@ -121,7 +122,7 @@ namespace JapaneseDemonHunter.Gameplay
             {
                 emitter = monster.gameObject.AddComponent<MonsterSoundEmitter>();
                 emitter.Configure(flying ? batWingsClip : zombieVoiceClip,
-                    flying ? batDeathClip : zombieDeathClip, hitClip);
+                    flying ? batDeathClip : zombieDeathClip, hitClip, flying ? 0.256f : zombieDeathSoundVolume);
             }
             MonsterDeathPhysics fall = monster.GetComponent<MonsterDeathPhysics>();
             if (fall == null) fall = monster.gameObject.AddComponent<MonsterDeathPhysics>();
@@ -180,13 +181,18 @@ namespace JapaneseDemonHunter.Gameplay
         private AudioSource source;
         private MonsterDamageable damageable;
         private AudioClip deathClip;
-        private AudioClip hitClip;
+        [SerializeField, Range(0f,1f)] private float deathSoundVolume = 0.512f;
+        private bool deathPlayed;
+        public int DeathSoundCount { get; private set; }
 
-        public void Configure(AudioClip movementClip, AudioClip configuredDeathClip, AudioClip configuredHitClip)
+        public void Configure(AudioClip movementClip, AudioClip configuredDeathClip, AudioClip configuredHitClip,
+            float configuredDeathVolume = 0.512f)
         {
+            if (damageable != null) damageable.Killed -= OnKilled;
             deathClip = configuredDeathClip;
-            hitClip = configuredHitClip;
-            source = gameObject.AddComponent<AudioSource>();
+            deathSoundVolume = Mathf.Clamp01(configuredDeathVolume);
+            deathPlayed = false;
+            if (source == null) source = gameObject.AddComponent<AudioSource>();
             source.playOnAwake = false;
             source.spatialBlend = 1f;
             source.minDistance = 1f;
@@ -199,7 +205,6 @@ namespace JapaneseDemonHunter.Gameplay
             damageable = GetComponent<MonsterDamageable>();
             if (damageable != null)
             {
-                damageable.Damaged += OnDamaged;
                 damageable.Killed += OnKilled;
             }
         }
@@ -208,22 +213,22 @@ namespace JapaneseDemonHunter.Gameplay
         {
             if (damageable != null)
             {
-                damageable.Damaged -= OnDamaged;
                 damageable.Killed -= OnKilled;
             }
         }
 
-        private void OnDamaged(MonsterDamageable monster, float damage, Component attacker)
-        {
-            if (source != null && hitClip != null) source.PlayOneShot(hitClip, 0.5f);
-        }
-
         private void OnKilled(MonsterDamageable monster)
         {
-            if (source == null) return;
+            if (source == null || deathPlayed || monster == null || monster.IsAlive) return;
+            deathPlayed = true;
             source.Stop();
             source.loop = false;
-            if (deathClip != null) source.PlayOneShot(deathClip, 0.8f);
+            source.volume = 1f;
+            if (deathClip != null)
+            {
+                source.PlayOneShot(deathClip,deathSoundVolume);
+                DeathSoundCount++;
+            }
         }
     }
 }

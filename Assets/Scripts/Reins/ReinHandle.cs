@@ -13,7 +13,7 @@ namespace Reins
     {
         [SerializeField] private Handedness expectedHand;
         [Tooltip("When enabled, only this side's hand can hold this grip.")]
-        [SerializeField] private bool requireExpectedHand = true;
+        [SerializeField] private bool requireExpectedHand;
         [Tooltip("Where the pin settles when nobody is holding the rope.")]
         [SerializeField] private Vector3 restLocalPosition;
         [Tooltip("Hand-grabbable handle(s) attached to this end of the shared rope.")]
@@ -38,7 +38,7 @@ namespace Reins
         [SerializeField] private bool enableBrakeGesture;
         [Tooltip("Sideways pull that changes lane.")]
         [SerializeField, Min(0f)] private float laneThreshold = 0.18f;
-        [SerializeField] private bool enableLaneGesture;
+        [SerializeField] private bool enableLaneGesture = true;
         [Tooltip("How close to the neutral point the rope must come back before another stroke is allowed.")]
         [SerializeField, Min(0f)] private float rearmRadius = 0.12f;
         [SerializeField, Min(0f)] private float gestureCooldown = 0.35f;
@@ -244,10 +244,16 @@ namespace Reins
 
         private bool CanDrive(IHand hand)
         {
+            return CanDriveHand(hand.Handedness, hand.IsConnected, hand.IsTrackedDataValid);
+        }
+
+        /// <summary>Uses the selected hand's tracking; handle identity never implies a hand side.</summary>
+        public bool CanDriveHand(Handedness actualHand, bool connected, bool tracked)
+        {
             return requireExpectedHand
                 ? ReinHandOwnership.CanDrive(
-                    expectedHand, hand.Handedness, true, hand.IsConnected, hand.IsTrackedDataValid)
-                : ReinHandOwnership.CanDriveWithEitherHand(true, hand.IsConnected, hand.IsTrackedDataValid);
+                    expectedHand, actualHand, true, connected, tracked)
+                : ReinHandOwnership.CanDriveWithEitherHand(true, connected, tracked);
         }
 
         private Vector3 ToParentSpace(Vector3 worldPosition)

@@ -1,0 +1,106 @@
+﻿[
+    {
+        "result":  {
+                       "passed":  true,
+                       "combinations":  4,
+                       "speeds":  [
+                                      3.5,
+                                      5.0,
+                                      6.5,
+                                      8.0,
+                                      8.0
+                                  ],
+                       "acceleration":  1.5,
+                       "maximum":  8.0,
+                       "rigLocalPosition":  "(0.000, 0.560, -0.600)",
+                       "desktopConfigured":  true,
+                       "realTrackingTested":  false
+                   },
+        "priority":  1
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "neutral":  true,
+                       "deadZoneMetres":  0.18,
+                       "smoothSeconds":  0.8,
+                       "directions":  2,
+                       "noHeldPullSpam":  true
+                   },
+        "priority":  2
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "insideStays":  true,
+                       "outsideReturns":  true,
+                       "heldNeverTeleports":  true,
+                       "delaySeconds":  1.25
+                   },
+        "priority":  3
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "localPosition":  "(0.550, 0.635, -0.250)",
+                       "leftDistance":  0.9987676,
+                       "rightDistance":  1.32118762,
+                       "hitboxPreserved":  true,
+                       "respawnMatches":  true,
+                       "physicalReachTested":  false
+                   },
+        "priority":  4
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "grabOnlyOnce":  true,
+                       "airSilent":  true,
+                       "oneImpactPerWindow":  true,
+                       "impactClips":  [
+                                           "3",
+                                           "2",
+                                           "3",
+                                           "1",
+                                           "4",
+                                           "2",
+                                           "4",
+                                           "3",
+                                           "2",
+                                           "1",
+                                           "3",
+                                           "1",
+                                           "3",
+                                           "4",
+                                           "1",
+                                           "2"
+                                       ],
+                       "fifthClipExcluded":  true
+                   },
+        "priority":  5
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "handDamage":  8,
+                       "minimumVelocity":  2,
+                       "cooldown":  0.35,
+                       "hitSounds":  4,
+                       "hitsToKill":  4,
+                       "invalidTrackingDisabled":  true
+                   },
+        "priority":  6
+    },
+    {
+        "result":  {
+                       "passed":  true,
+                       "once":  true,
+                       "volume":  0.512,
+                       "formerVolume":  0.256,
+                       "clipLength":  1.54122448,
+                       "deadCannotReceiveDamage":  true,
+                       "attachmentReleased":  true
+                   },
+        "priority":  7
+    }
+]
