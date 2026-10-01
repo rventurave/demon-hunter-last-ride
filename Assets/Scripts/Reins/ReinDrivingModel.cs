@@ -44,6 +44,7 @@ namespace Reins
         private bool _lifted;
         private bool _armed = true;
         private bool _requiresPlanarReturn;
+        private int _lastLaneDirection;
 
         public ReinGestureStateMachine(
             float liftThreshold = 0.12f,
@@ -85,7 +86,10 @@ namespace Reins
             // hangs away from its resting point.
             bool planarNeutral = new Vector2(pull.x, pull.z).sqrMagnitude <=
                                  _rearmRadius * _rearmRadius;
-            if (_requiresPlanarReturn && planarNeutral)
+            // Steering only needs its own axis to return; a backward offset must not lock X.
+            bool returnNeutral = _lastLaneDirection != 0
+                ? Mathf.Abs(pull.x) <= _rearmRadius : planarNeutral;
+            if (_requiresPlanarReturn && returnNeutral)
             {
                 _requiresPlanarReturn = false;
                 _armed = true;
@@ -118,6 +122,15 @@ namespace Reins
                 return Fire(ReinGestureKind.Accelerate, 0);
             }
 
+            // A clear reversal implies crossing neutral, even when tracking samples skip zero.
+            // Interrupt only an earlier steering command; lash/brake cooldowns stay unchanged.
+            int laneDirection = pull.x < 0f ? -1 : 1;
+            if (_laneEnabled && _lastLaneDirection != 0 && laneDirection != _lastLaneDirection &&
+                Mathf.Abs(pull.x) >= _laneThreshold)
+            {
+                return Fire(ReinGestureKind.LanePull, laneDirection);
+            }
+
             if (_armed && _cooldown <= 0f)
             {
                 if (_brakeEnabled && pull.z >= _brakeThreshold)
@@ -145,6 +158,7 @@ namespace Reins
         {
             _armed = false;
             _requiresPlanarReturn = kind == ReinGestureKind.Brake || kind == ReinGestureKind.LanePull;
+            _lastLaneDirection = kind == ReinGestureKind.LanePull ? direction : 0;
             _lifted = false;
             _cooldown = _cooldownSeconds;
             return new ReinGesture(kind, direction);
@@ -159,6 +173,7 @@ namespace Reins
             _lifted = false;
             _armed = true;
             _requiresPlanarReturn = false;
+            _lastLaneDirection = 0;
         }
     }
 

@@ -7,6 +7,7 @@ namespace JapaneseDemonHunter.Monsters
     {
         [SerializeField] private Animator animator;
         [SerializeField] private string locomotionState = "Locomotion";
+        [SerializeField] private string runState = "";
         [SerializeField] private string attackState = "Attack";
         [SerializeField] private string deathState = "Death";
         [SerializeField, Min(0f)] private float transitionDuration = 0.15f;
@@ -33,6 +34,14 @@ namespace JapaneseDemonHunter.Monsters
         {
             SetPlaybackSpeed(playbackSpeed);
             PlayState(locomotionHash);
+        }
+
+        public void PlayRun(float playbackSpeed=1f)
+        {
+            int hash=string.IsNullOrWhiteSpace(runState) ? 0 : Animator.StringToHash(runState);
+            if(!HasState(hash)) {PlayLocomotion(playbackSpeed); return;}
+            SetPlaybackSpeed(playbackSpeed);
+            PlayState(hash);
         }
 
         public void PlayAttack(float playbackSpeed = 1f)

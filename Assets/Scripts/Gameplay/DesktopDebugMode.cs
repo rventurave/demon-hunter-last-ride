@@ -121,6 +121,11 @@ namespace JapaneseDemonHunter.Gameplay
 
         public void SpawnGroup()
         {
+            if(active && spawner!=null && spawner.UsesEncounterGroups)
+            {
+                spawner.TrySpawnEncounter(UnityEngine.Random.value<.5f ? MonsterSpawnDirection.LeftForest : MonsterSpawnDirection.RightForest);
+                return;
+            }
             for (int index = 0; index < groupSpawnCount; index++) SpawnZombie(index % 3 - 1);
         }
 

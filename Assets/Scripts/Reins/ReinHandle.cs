@@ -37,7 +37,7 @@ namespace Reins
         [Tooltip("Disabled by design: pulling the rope backwards no longer brakes the carriage.")]
         [SerializeField] private bool enableBrakeGesture;
         [Tooltip("Sideways pull that changes lane.")]
-        [SerializeField, Min(0f)] private float laneThreshold = 0.18f;
+        [SerializeField, Min(0f)] private float laneThreshold = 0.15f;
         [SerializeField] private bool enableLaneGesture = true;
         [Tooltip("How close to the neutral point the rope must come back before another stroke is allowed.")]
         [SerializeField, Min(0f)] private float rearmRadius = 0.12f;

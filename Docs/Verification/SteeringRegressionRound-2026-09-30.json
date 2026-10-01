@@ -1,0 +1,19 @@
+﻿{
+    "regressionPassed":  45,
+    "unityTestRunner":  false,
+    "regressionFailed":  0,
+    "deterministicAssertions":  114,
+    "errors":  0,
+    "fixtures":  [
+                     "ReinDrivingModelTests",
+                     "CartHitPenaltyModelTests"
+                 ],
+    "editorPlayTested":  false,
+    "sceneSensitivityMigrationApplied":  false,
+    "assembliesCompiled":  [
+                               "Reins",
+                               "JapaneseDemonHunter.Gameplay.Editor",
+                               "JapaneseDemonHunter.Gameplay.EditModeTests",
+                               "Reins.EditModeTests"
+                           ]
+}

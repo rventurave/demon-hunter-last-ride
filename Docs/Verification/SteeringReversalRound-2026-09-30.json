@@ -1,0 +1,9 @@
+﻿{
+    "fullEditorCompile":  false,
+    "baselineFailedAsExpected":  true,
+    "assertions":  114,
+    "correctedPassed":  true,
+    "sceneSensitivityMigrationApplied":  false,
+    "playMode":  false,
+    "compiledAgainstRealUnityAssemblies":  true
+}

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 namespace JapaneseDemonHunter.Gameplay
 {
-    public enum RideSessionPhase { WaitingToStart, Playing, GameOver }
+    public enum RideSessionPhase { WaitingToStart, Playing, GameOver, Victory }
     /// <summary>
     /// Finite ride and in-world outcome. No HUD, timer, head-locked panel or forced camera motion.
     /// Added by LevelVictoryController at runtime so existing scenes keep their Inspector changes.
@@ -155,9 +155,12 @@ namespace JapaneseDemonHunter.Gameplay
         {
             if (run == null || !run.Win()) return;
             ended = true;
-            Phase = RideSessionPhase.GameOver;
+            Phase = RideSessionPhase.Victory;
+            if(giantSpawner!=null) giantSpawner.enabled=false;
+            var bats=FindAnyObjectByType<FaceBatThreatController>();
+            if(bats!=null) bats.enabled=false;
             if (deathEffect != null) deathEffect.ResetDefeat();
-            ShowWorldResult("VICTORIA", new Color(1f, 0.76f, 0.35f));
+            ShowWorldResult("CONGRATULATIONS", new Color(1f, 0.76f, 0.35f));
         }
 
         private void HandleGiantDefeat()
@@ -181,7 +184,7 @@ namespace JapaneseDemonHunter.Gameplay
             if (motor != null) motor.enabled = false;
             if (spawner != null)
             {
-                spawner.enabled = false;
+                spawner.StopSpawning();
                 foreach (MonsterBase monster in new List<MonsterBase>(spawner.ActiveMonsters))
                     if (monster != null) monster.Retire();
             }

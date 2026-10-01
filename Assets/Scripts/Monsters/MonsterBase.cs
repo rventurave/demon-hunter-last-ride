@@ -550,12 +550,14 @@ namespace JapaneseDemonHunter.Monsters
             switch (State)
             {
                 case MonsterState.Patrol:
-                case MonsterState.Chase:
                 case MonsterState.Approach:
                 case MonsterState.Retreat:
                 case MonsterState.SelectAttachment:
-                case MonsterState.ChaseAttachment:
                     animationController.PlayLocomotion();
+                    break;
+                case MonsterState.Chase:
+                case MonsterState.ChaseAttachment:
+                    animationController.PlayRun(SpeedMultiplier);
                     break;
                 case MonsterState.Attack:
                 case MonsterState.Attach:

@@ -1,0 +1,17 @@
+﻿{
+    "id":  "9a305033-7324-49e4-8999-86c86e824d50",
+    "action":  "balancePlay",
+    "project":  "D:/IHC-2026B/demon-hunter-last-ride/Assets",
+    "scene":  "Assets/Scenes/JapanDemonHunter.unity",
+    "error":  "",
+    "passed":  true,
+    "playMode":  true,
+    "zombieHealth":  12.0,
+    "swordDamage":  12.0,
+    "handDamage":  8.0,
+    "firstHandHealth":  4.0,
+    "swordHits":  1,
+    "handHits":  2,
+    "swordImpactSounds":  1,
+    "deathSounds":  2
+}

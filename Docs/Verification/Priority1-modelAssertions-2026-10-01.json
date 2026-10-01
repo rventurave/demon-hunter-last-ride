@@ -1,0 +1,1 @@
+{"passed":false,"executedAssertions":0,"error":"Standalone runner unavailable: netstandard 2.1 assembly missing. Native Editor regressions and Play Mode passed separately; previous 114 assertions were not rerun."}

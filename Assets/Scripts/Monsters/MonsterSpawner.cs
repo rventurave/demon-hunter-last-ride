@@ -10,7 +10,9 @@ namespace JapaneseDemonHunter.Monsters
     {
         Rear,
         FrontLane,
-        FrontDispersed
+        FrontDispersed,
+        LeftForest,
+        RightForest
     }
 
     [Serializable]
@@ -55,7 +57,17 @@ namespace JapaneseDemonHunter.Monsters
         [SerializeField] private bool waitForFirstGallop = true;
         [SerializeField, Min(0.1f)] private float spawnInterval = 11f;
         [Tooltip("Seconds before the first spawn when the scene must start empty.")]
-        [SerializeField, Min(0f)] private float initialSpawnDelay = 35f;
+        [SerializeField, Min(0f)] private float initialSpawnDelay = 7f;
+        [Header("Encuentros de zombies normales")]
+        [SerializeField] private bool useEncounterGroups;
+        [SerializeField, Min(0f)] private float postEncounterSpawnDelay=15f;
+        [SerializeField, Min(1)] private int lateralGroupMinimum=2;
+        [SerializeField, Min(1)] private int lateralGroupMaximum=4;
+        [SerializeField, Range(0f,1f)] private float frontalEncounterChance=.25f;
+        [SerializeField] private Vector2 forestSideOffset=new Vector2(8f,14f);
+        [SerializeField] private Vector2 encounterForwardDistance=new Vector2(18f,26f);
+        [SerializeField] private Transform forestRoot;
+        [SerializeField, Min(.1f)] private float treeTrunkClearance=1.2f;
         [Header("Horda permanente")]
         [Tooltip("Rear monsters that must always be alive behind the cart, so the ride is never empty.")]
         [SerializeField, Min(0)] private int minimumHordeSize;
@@ -83,13 +95,21 @@ namespace JapaneseDemonHunter.Monsters
         [SerializeField, Min(0.1f)] private float frontLaneSpacing = 2.8f;
 
         private readonly HashSet<MonsterBase> activeMonsters = new HashSet<MonsterBase>();
+        private readonly HashSet<MonsterBase> encounterMonsters=new HashSet<MonsterBase>();
+        private readonly List<Transform> forestTransforms=new List<Transform>(512);
+        private bool encounterInProgress;
         private readonly List<MonsterBase> rearMonsters = new List<MonsterBase>();
         private RearHordeModel hordeModel;
         private float nextHordeRefillTime;
         private float nextSpawnTime;
+        private float firstSpawnTime;
+        private bool spawnSequenceStarted;
         private ICartFirstGallopSource firstGallopSource;
         private bool waitingForFirstGallop;
         private int reservedFaceThreatSlots;
+        private bool spawningStopped;
+        public bool SpawningStopped => spawningStopped;
+        public void StopSpawning() {spawningStopped=true; enabled=false;}
 
         public Transform CartTransform => cartTransform;
         public int ActiveMonsterCount => activeMonsters.Count;
@@ -97,6 +117,10 @@ namespace JapaneseDemonHunter.Monsters
         public bool SpawnsOneOfEachOnStart => spawnOneOfEachOnStart;
         public float InitialSpawnDelay => initialSpawnDelay;
         public float SpawnInterval => spawnInterval;
+        public float PostEncounterSpawnDelay => postEncounterSpawnDelay;
+        public bool UsesEncounterGroups => useEncounterGroups;
+        public bool EncounterInProgress => encounterInProgress;
+        public float SecondsUntilNextEncounter => Mathf.Max(0f,nextSpawnTime-Time.time);
         public bool WaitsForFirstGallop => waitForFirstGallop;
         public bool IsWaitingForFirstGallop => waitingForFirstGallop;
         public bool HasFirstGallopSource => firstGallopSource != null ||
@@ -154,6 +178,8 @@ namespace JapaneseDemonHunter.Monsters
 
         private void BeginSpawnSequence()
         {
+            spawnSequenceStarted=true;
+            firstSpawnTime=Time.time+(spawnOneOfEachOnStart ? 0f : initialSpawnDelay);
             if (spawnOneOfEachOnStart)
             {
                 foreach (MonsterSpawnEntry entry in spawnEntries)
@@ -174,8 +200,10 @@ namespace JapaneseDemonHunter.Monsters
         {
             RemoveStaleReferences();
             RetireDistantMonsters();
-            MaintainHorde();
-            if (waitingForFirstGallop || Time.time < nextSpawnTime)
+            if (!spawnSequenceStarted || waitingForFirstGallop || Time.time < firstSpawnTime) return;
+            if(useEncounterGroups && encounterInProgress) return;
+            if(!useEncounterGroups) MaintainHorde();
+            if (Time.time < nextSpawnTime)
             {
                 return;
             }
@@ -183,7 +211,7 @@ namespace JapaneseDemonHunter.Monsters
             nextSpawnTime = Time.time + spawnInterval;
             if (activeMonsters.Count < maximumActiveMonsters - reservedFaceThreatSlots)
             {
-                TrySpawn();
+                if(useEncounterGroups) TrySpawnEncounter(); else TrySpawn();
             }
         }
 
@@ -271,7 +299,7 @@ namespace JapaneseDemonHunter.Monsters
 
         public bool TrySpawn(MonsterSpawnEntry requestedEntry = null)
         {
-            if (!IsConfigured || activeMonsters.Count >= maximumActiveMonsters)
+            if (spawningStopped || !IsConfigured || activeMonsters.Count >= maximumActiveMonsters)
             {
                 return false;
             }
@@ -287,13 +315,36 @@ namespace JapaneseDemonHunter.Monsters
             return SpawnAtPosition(entry, position, frontLaneIndex) != null;
         }
 
+        public int TrySpawnEncounter(MonsterSpawnDirection? requestedDirection=null)
+        {
+            if(spawningStopped) return 0;
+            var source=spawnEntries.FirstOrDefault(e=>e!=null && e.prefab!=null &&
+                e.movementType==MonsterMovementType.Ground && !e.isFaceThreat && e.weight>0f);
+            if(source==null || !IsConfigured) return 0;
+            var direction=requestedDirection ?? (UnityEngine.Random.value<frontalEncounterChance
+                ? MonsterSpawnDirection.FrontLane : UnityEngine.Random.value<.5f
+                    ? MonsterSpawnDirection.LeftForest : MonsterSpawnDirection.RightForest);
+            bool lateral=direction==MonsterSpawnDirection.LeftForest || direction==MonsterSpawnDirection.RightForest;
+            int count=lateral ? UnityEngine.Random.Range(Mathf.Max(1,lateralGroupMinimum),Mathf.Max(lateralGroupMinimum,lateralGroupMaximum)+1) : 1;
+            var entry=new MonsterSpawnEntry {prefab=source.prefab,movementType=source.movementType,
+                spawnDirection=direction,attachmentLoad=source.attachmentLoad,speedMultiplier=source.speedMultiplier,
+                weight=source.weight,overrideTargetStrategy=source.overrideTargetStrategy,targetStrategy=source.targetStrategy,
+                frontLaneForwardRadius=UnityEngine.Random.Range(encounterForwardDistance.x,encounterForwardDistance.y)};
+            int spawned=0;
+            for(int i=0;i<count && activeMonsters.Count<maximumActiveMonsters-reservedFaceThreatSlots;i++)
+            {
+                if(TrySpawn(entry)) {spawned++; Physics.SyncTransforms();}
+            }
+            return spawned;
+        }
+
 #if UNITY_EDITOR
         public void NotifyDebugFirstGallop() => HandleFirstGallop();
 
         /// <summary>Debug placement through the same terrain checks, capacity and initialization as normal spawning.</summary>
         public bool TrySpawnAtAngle(MonsterSpawnEntry entry, float angleDegrees, float radius)
         {
-            if (!IsConfigured || activeMonsters.Count >= maximumActiveMonsters || entry == null ||
+            if (spawningStopped || !IsConfigured || activeMonsters.Count >= maximumActiveMonsters || entry == null ||
                 entry.prefab == null || !TryValidatePositionAtAngle(entry.movementType, angleDegrees,
                     radius, out Vector3 position)) return false;
             return SpawnAtPosition(entry, position, 0) != null;
@@ -302,7 +353,7 @@ namespace JapaneseDemonHunter.Monsters
 
         public bool TrySpawnFaceThreatRound(int count)
         {
-            if (!IsConfigured || count < 1 || count > 3 ||
+            if (spawningStopped || !IsConfigured || count < 1 || count > 3 ||
                 activeMonsters.Count + count > maximumActiveMonsters)
             {
                 return false;
@@ -352,6 +403,12 @@ namespace JapaneseDemonHunter.Monsters
             monster.name = entry.prefab.name;
             monster.BecameInactive += HandleMonsterInactive;
             activeMonsters.Add(monster);
+            if(useEncounterGroups && entry.movementType==MonsterMovementType.Ground && !entry.isFaceThreat)
+            {
+                encounterMonsters.Add(monster);
+                monster.Died+=HandleEncounterDeath;
+                encounterInProgress=true;
+            }
             if (entry.spawnDirection == MonsterSpawnDirection.Rear)
             {
                 rearMonsters.Add(monster);
@@ -429,6 +486,19 @@ namespace JapaneseDemonHunter.Monsters
             if (entry.spawnDirection == MonsterSpawnDirection.FrontLane)
             {
                 return TryFindFrontLanePosition(entry, out position, out frontLaneIndex);
+            }
+
+            if(entry.spawnDirection==MonsterSpawnDirection.LeftForest || entry.spawnDirection==MonsterSpawnDirection.RightForest)
+            {
+                float side=entry.spawnDirection==MonsterSpawnDirection.LeftForest ? -1f : 1f;
+                for(int attempt=0;attempt<maximumPlacementAttempts;attempt++)
+                {
+                    float x=side*UnityEngine.Random.Range(forestSideOffset.x,forestSideOffset.y);
+                    float z=-UnityEngine.Random.Range(encounterForwardDistance.x,encounterForwardDistance.y);
+                    if(TryValidatePositionAtAngle(entry.movementType,Mathf.Atan2(x,z)*Mathf.Rad2Deg,
+                        Mathf.Sqrt(x*x+z*z),out position) && IsOutsideTreeTrunks(position)) return true;
+                }
+                return false;
             }
 
             float entryMinimumRadius = entry.minimumRadius > 0f ? entry.minimumRadius : minimumRadius;
@@ -737,6 +807,19 @@ namespace JapaneseDemonHunter.Monsters
             return true;
         }
 
+        private bool IsOutsideTreeTrunks(Vector3 candidate)
+        {
+            if(forestRoot==null) return true;
+            forestRoot.GetComponentsInChildren(false,forestTransforms);
+            foreach(var tree in forestTransforms)
+            {
+                if(!tree.name.StartsWith("Tree_",StringComparison.Ordinal)) continue;
+                var delta=Vector3.ProjectOnPlane(tree.position-candidate,Vector3.up);
+                if(delta.sqrMagnitude<treeTrunkClearance*treeTrunkClearance) return false;
+            }
+            return true;
+        }
+
         private void HandleMonsterInactive(MonsterBase monster)
         {
             if (monster == null)
@@ -745,13 +828,27 @@ namespace JapaneseDemonHunter.Monsters
             }
 
             monster.BecameInactive -= HandleMonsterInactive;
+            monster.Died-=HandleEncounterDeath;
+            encounterMonsters.Remove(monster);
             activeMonsters.Remove(monster);
             rearMonsters.Remove(monster);
+            FinishEncounterIfEmpty();
             Destroy(monster.gameObject);
+        }
+
+        private void HandleEncounterDeath(MonsterBase monster) => FinishEncounterIfEmpty();
+
+        private void FinishEncounterIfEmpty()
+        {
+            if(!encounterInProgress || encounterMonsters.Any(m=>m!=null && !m.IsDead && m.gameObject.activeInHierarchy)) return;
+            encounterInProgress=false;
+            nextSpawnTime=Time.time+postEncounterSpawnDelay;
         }
 
         private void RemoveStaleReferences()
         {
+            encounterMonsters.RemoveWhere(monster=>monster==null || !monster.gameObject.activeInHierarchy);
+            FinishEncounterIfEmpty();
             activeMonsters.RemoveWhere(monster => monster == null || !monster.gameObject.activeInHierarchy);
             rearMonsters.RemoveAll(monster => monster == null || !monster.gameObject.activeInHierarchy);
         }

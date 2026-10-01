@@ -144,6 +144,7 @@ MonoBehaviour:
   patrolSpeed: 6.8
   chaseSpeed: 6.8
   approachSpeed: 6.4
+  speedMultiplier: 1
   rotationSharpness: 7
   groundMask:
     serializedVersion: 2
@@ -204,6 +205,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterAnimationController
   animator: {fileID: 4834941122323960788}
   locomotionState: Locomotion
+  runState: 
   attackState: Attack
   deathState: Death
   transitionDuration: 0.15
@@ -261,7 +263,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ac5ab7c47c2c384292953245e139527, type: 3}
   m_Name: 
   m_EditorClassIdentifier: JapaneseDemonHunter.Monsters::JapaneseDemonHunter.Monsters.MonsterDamageable
-  maximumHealth: 30
+  maximumHealth: 12
   vulnerableToNormalSword: 1
 --- !u!114 &6938067390150551492
 MonoBehaviour:
@@ -279,6 +281,7 @@ MonoBehaviour:
   impactDelay: 0.28
   cooldown: 1.35
   attackAnimationSpeed: 1.15
+  animateOutsideAttackRange: 1
   obstructionMask:
     serializedVersion: 2
     m_Bits: 4294967295

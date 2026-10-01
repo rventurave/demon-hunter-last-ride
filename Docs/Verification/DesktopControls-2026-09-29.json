@@ -3,37 +3,37 @@
     "initialDirection": "(0.00, 0.00, -1.00)",
     "eyeHeight": 1.6,
     "mouseYawChange": 360.0,
-    "desktopLocalMovement": "(0.00, 0.00, 0.64)",
+    "desktopLocalMovement": "(0.00, 0.00, 0.60)",
     "xrRigUnchanged": true,
     "hudToggle": true
   },
   "speed": {
-    "before": 3.20445156,
-    "after": 4.651528,
+    "before": 3.5,
+    "after": 4.982815,
     "coast": [
-      4.651528,
-      4.558605,
-      4.478231,
-      4.385116
+      4.982815,
+      4.90243053,
+      4.82148552,
+      4.74142838
     ],
-    "afterSecond": 5.831056,
+    "afterSecond": 6.232629,
     "firstSpawnGateReleased": true
   },
   "spawn": {
     "placements": [
       {
         "key": "Z",
-        "position": "(0.00, -0.01, -13.02)",
-        "state": "SelectAttachment"
+        "position": "(0.00, -0.01, -14.39)",
+        "state": "Spawn"
       },
       {
         "key": "X",
-        "position": "(-3.12, -0.01, -12.85)",
-        "state": "SelectAttachment"
+        "position": "(-3.12, -0.01, -14.41)",
+        "state": "Spawn"
       },
       {
         "key": "C",
-        "position": "(3.12, -0.02, -13.07)",
+        "position": "(3.12, -0.01, -14.37)",
         "state": "Spawn"
       }
     ],
@@ -41,32 +41,32 @@
   },
   "fsm": [
     {
-      "state": "Attached",
-      "position": "(-1.89, 0.15, 0.24)"
+      "state": "ChaseAttachment",
+      "position": "(-0.63, -0.01, -5.90)"
     },
     {
       "state": "ChaseAttachment",
-      "position": "(-0.39, -0.01, 3.14)"
+      "position": "(-2.01, -0.01, -7.06)"
     },
     {
       "state": "ChaseAttachment",
-      "position": "(2.26, -0.01, 2.61)"
+      "position": "(2.67, -0.01, -7.38)"
     },
     {
       "state": "ChaseAttachment",
-      "position": "(-2.89, -0.01, 1.91)"
+      "position": "(-3.63, -0.01, -9.04)"
     },
     {
       "state": "ChaseAttachment",
-      "position": "(0.00, -0.03, -1.25)"
+      "position": "(0.24, -0.01, -8.92)"
     },
     {
       "state": "SelectAttachment",
-      "position": "(2.65, -0.01, 2.31)"
+      "position": "(2.51, -0.01, -9.48)"
     },
     {
       "state": "SelectAttachment",
-      "position": "(-4.05, -0.01, 1.05)"
+      "position": "(-4.59, -0.01, -10.92)"
     }
   ]
 }

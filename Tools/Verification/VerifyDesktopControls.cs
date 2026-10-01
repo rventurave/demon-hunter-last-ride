@@ -44,8 +44,9 @@ public static class VerifyDesktopControls
    Check(Vector3.Dot(direction,Vector3.ProjectOnPlane(horses-debug.DebugCamera.transform.position,Vector3.up).normalized)>.98f,"Initial camera does not face horses");
    Check(Mathf.Abs(debug.DebugCamera.transform.position.y-debug.DebugHunter.position.y-1.6f)<.02f,"Eye-height offset wrong");
    float yaw=debug.MouseCamera.Yaw;
+   debug.MouseCamera.CaptureCursor();
    mouse.MakeCurrent(); InputSystem.QueueStateEvent(mouse,new MouseState{delta=new Vector2(1500,0)}); await Frames();
-   Check(Mathf.Abs(debug.MouseCamera.Yaw-yaw-180f)<.5f,"Mouse cannot look behind");
+   Check(Mathf.Abs(debug.MouseCamera.Yaw-yaw-180f)<.5f,"Mouse cannot look behind: delta="+(debug.MouseCamera.Yaw-yaw));
    mouse.MakeCurrent(); InputSystem.QueueStateEvent(mouse,new MouseState{delta=new Vector2(1500,0)}); await Frames();
    Check(Mathf.Abs(debug.MouseCamera.Yaw-yaw-360f)<.5f,"Mouse cannot rotate 360 degrees");
    Vector3 start=debug.DebugHunter.localPosition;
@@ -66,24 +67,28 @@ public static class VerifyDesktopControls
    var placements=new List<object>();
    foreach(Key key in new[]{Key.Z,Key.X,Key.C})
    {
-    int count=spawner.ActiveMonsterCount; await Press(keyboard,key);
-    Check(spawner.ActiveMonsterCount==count+1,$"{key} failed to spawn through MonsterSpawner");
-    var newest=spawner.ActiveMonsters.Last();
+    var beforeKey=spawner.ActiveMonsters.ToArray(); await Press(keyboard,key);
+    var added=spawner.ActiveMonsters.Except(beforeKey).ToArray();
+    Check(added.Length==1,$"{key} failed to spawn through MonsterSpawner");
+    var newest=added[0];
     Vector3 local=motor.transform.InverseTransformPoint(newest.transform.position);
     Check(local.z<0,$"{key} did not spawn in front");
     if(key==Key.X)Check(local.x<0,"X did not spawn left");
     if(key==Key.C)Check(local.x>0,"C did not spawn right");
     placements.Add(new{key=key.ToString(),position=local.ToString(),state=newest.State.ToString()});
    }
+   var beforeMembers=spawner.ActiveMonsters.ToArray();
    int beforeGroup=spawner.ActiveMonsterCount; await Press(keyboard,Key.V);
-   Check(spawner.ActiveMonsterCount>beforeGroup,"V did not create a dispersed group");
-   result["spawn"]=new{placements,groupAdded=spawner.ActiveMonsterCount-beforeGroup};
+   var newMembers=spawner.ActiveMonsters.Except(beforeMembers).ToArray();
+   Check(newMembers.Length>0,"V did not create a dispersed group");
+   if(spawner.UsesEncounterGroups) Check(newMembers.All(m=>m.SpawnDirection==MonsterSpawnDirection.LeftForest || m.SpawnDirection==MonsterSpawnDirection.RightForest),"V creates a frontal group");
+   result["spawn"]=new{placements,groupAdded=newMembers.Length,lateralGroup=true};
    var zombies=spawner.ActiveMonsters.Where(m=>m.MovementType==MonsterMovementType.Ground).ToArray();
    await Task.Delay(500);
    Check(zombies.Any(m=>m.State==MonsterState.ChaseAttachment||m.State==MonsterState.Attach||m.State==MonsterState.Attached),"Ground FSM never pursued attachment");
    await Press(keyboard,Key.Space); await Press(keyboard,Key.Space);
    result["fsm"]=zombies.Select(m=>new{state=m.State.ToString(),position=motor.transform.InverseTransformPoint(m.transform.position).ToString()}).ToArray();
-   System.IO.File.WriteAllText("Docs/Verification/DesktopControls-2026-09-29.json",Unity.Plastic.Newtonsoft.Json.JsonConvert.SerializeObject(result,Unity.Plastic.Newtonsoft.Json.Formatting.Indented));
+   System.IO.File.WriteAllText("Docs/Verification/DesktopControls-2026-10-01.json",Unity.Plastic.Newtonsoft.Json.JsonConvert.SerializeObject(result,Unity.Plastic.Newtonsoft.Json.Formatting.Indented));
    return result;
   }
   finally

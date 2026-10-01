@@ -12,6 +12,24 @@ using Object = UnityEngine.Object;
 
 public static class VerifyRidePriorities
 {
+    public static object SteeringRegressionAssertions()
+    {
+        Check(!Application.isPlaying,"Stop Play first");
+        int count=0;
+        foreach(string name in new[]{"Reins.Tests.ReinDrivingModelTests","Reins.Tests.CartHitPenaltyModelTests"})
+        {
+            var type=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType(name)).Single(t=>t!=null);
+            foreach(var method in type.GetMethods())
+            {
+                var attributes=method.GetCustomAttributes(false);
+                var cases=attributes.Where(a=>a.GetType().Name=="TestCaseAttribute").ToArray();
+                if(cases.Length==0 && !attributes.Any(a=>a.GetType().Name=="TestAttribute")) continue;
+                var arguments=cases.Length==0 ? new object[][]{Array.Empty<object>()} : cases.Select(a=>(object[])a.GetType().GetProperty("Arguments").GetValue(a)).ToArray();
+                foreach(var args in arguments) { method.Invoke(Activator.CreateInstance(type),args); count++; }
+            }
+        }
+        return new {passed=true,count,unityTestRunner=false};
+    }
     // Runs focused NUnit assertions directly, without the runner that previously stalled.
     public static object FocusedEditModeAssertions()
     {
@@ -315,25 +333,19 @@ public static class VerifyRidePriorities
             Physics.SyncTransforms(); Call(hands,"LateUpdate");
             var sweeps=interactors.Select(go=>go.GetComponentInChildren<SwordDamage>()).ToArray();
             foreach(var sweep in sweeps) { Call(sweep,"OnEnable"); Call(sweep,"Update"); }
-            Check(health.CurrentHealth==30 && hands.PlayedHitSoundCount==0,"Gentle contact hurts/plays sound");
+            Check(health.CurrentHealth==12 && hands.PlayedHitSoundCount==0,"Gentle contact hurts/plays sound");
             for(int i=0;i<2;i++)
             {
                 data[i].Position+=Vector3.right*2f; Call(hands,"LateUpdate"); Call(sweeps[i],"Update");
-                Check(health.CurrentHealth==30-8*(i+1) && hands.PlayedHitSoundCount==i+1,"Fast hand hit not registered");
+                Check(health.CurrentHealth==Mathf.Max(0,12-8*(i+1)) && hands.PlayedHitSoundCount==i+1,"Fast hand hit not registered");
                 for(int j=0;j<10;j++) Call(sweeps[i],"Update");
                 Check(hands.PlayedHitSoundCount==i+1,"Repeated contact spams sound");
                 sweeps[i].EndAttackWindow(); data[i].Position-=Vector3.right*2f; Call(hands,"LateUpdate"); Call(sweeps[i],"Update");
                 Check(hands.PlayedHitSoundCount==i+1,"Cooldown allows rapid second hit");
             }
-            Check(health.IsAlive,"Zombie died in fewer than several hand hits");
-            foreach(var sweep in sweeps) { Write(sweep,"nextVelocityWindow",Time.time-1); sweep.EndAttackWindow(); }
-            for(int i=0;i<2;i++)
-            {
-                data[i].Position+=Vector3.right*2f; Call(hands,"LateUpdate"); Call(sweeps[i],"Update");
-            }
-            Check(!health.IsAlive && health.CurrentHealth==0 && hands.PlayedHitSoundCount==4,"Four balanced hand hits did not kill");
+            Check(!health.IsAlive && health.CurrentHealth==0 && hands.PlayedHitSoundCount==2,"Two balanced hand hits did not kill");
             data[0].Valid=false; Call(hands,"LateUpdate"); Check(!sweeps[0].enabled,"Invalid hand tracking can damage");
-            return new {passed=true,handDamage=8,minimumVelocity=2,cooldown=.35,hitSounds=hands.PlayedHitSoundCount,hitsToKill=4,invalidTrackingDisabled=true};
+            return new {passed=true,handDamage=8,minimumVelocity=2,cooldown=.35,hitSounds=hands.PlayedHitSoundCount,hitsToKill=2,invalidTrackingDisabled=true};
         }
         finally { foreach(var go in interactors) if(go!=null) Object.DestroyImmediate(go); Object.DestroyImmediate(cart); Object.DestroyImmediate(victim); Physics.SyncTransforms(); }
     }

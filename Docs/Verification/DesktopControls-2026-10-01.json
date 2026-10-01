@@ -1,0 +1,65 @@
+{
+  "camera": {
+    "initialDirection": "(0.00, 0.00, -1.00)",
+    "eyeHeight": 1.6,
+    "mouseYawChange": 360.0,
+    "desktopLocalMovement": "(0.00, 0.00, 0.61)",
+    "xrRigUnchanged": true,
+    "hudToggle": true
+  },
+  "speed": {
+    "before": 3.5,
+    "after": 4.98335838,
+    "coast": [
+      4.98335838,
+      4.903369,
+      4.82238865,
+      4.74177074
+    ],
+    "afterSecond": 6.23326159,
+    "firstSpawnGateReleased": true
+  },
+  "spawn": {
+    "placements": [
+      {
+        "key": "Z",
+        "position": "(0.00, -0.01, -14.48)",
+        "state": "Spawn"
+      },
+      {
+        "key": "X",
+        "position": "(-3.12, -0.01, -14.33)",
+        "state": "Spawn"
+      },
+      {
+        "key": "C",
+        "position": "(3.12, -0.01, -14.35)",
+        "state": "Spawn"
+      }
+    ],
+    "groupAdded": 2,
+    "lateralGroup": true
+  },
+  "fsm": [
+    {
+      "state": "ChaseAttachment",
+      "position": "(-0.64, -0.01, -5.77)"
+    },
+    {
+      "state": "ChaseAttachment",
+      "position": "(-2.03, -0.01, -6.73)"
+    },
+    {
+      "state": "ChaseAttachment",
+      "position": "(2.66, -0.01, -7.20)"
+    },
+    {
+      "state": "ChaseAttachment",
+      "position": "(7.87, -0.01, -11.60)"
+    },
+    {
+      "state": "ChaseAttachment",
+      "position": "(9.21, -0.01, -18.75)"
+    }
+  ]
+}

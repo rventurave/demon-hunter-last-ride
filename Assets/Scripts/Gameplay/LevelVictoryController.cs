@@ -17,6 +17,8 @@ namespace JapaneseDemonHunter.Gameplay
         [SerializeField] private CarriageMotor motor;
         [SerializeField] private MonsterSpawner spawner;
         [SerializeField] private GiantZombieSpawner giantSpawner;
+        [SerializeField] private CastleGoalTrigger castleGoal;
+        [SerializeField] private ParticleSystem[] victoryFireworks;
         [SerializeField] private GameObject victoryPresentation;
         [SerializeField] private Light[] kingdomLights;
         [SerializeField, Min(1f)] private float kingdomLightMultiplier = 2.5f;
@@ -32,6 +34,7 @@ namespace JapaneseDemonHunter.Gameplay
 
         private void Awake()
         {
+            if(castleGoal!=null) castleGoal.CartArrived+=Complete;
             // Existing playable scenes gain the run director without rewriting Unity scene YAML.
             var session = GetComponent<GameSessionController>();
             if (session == null) session = gameObject.AddComponent<GameSessionController>();
@@ -40,6 +43,8 @@ namespace JapaneseDemonHunter.Gameplay
 
         private void Start()
         {
+            if(victoryFireworks!=null)
+                foreach(var effect in victoryFireworks) if(effect!=null) effect.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
             if (kingdomLights != null)
             {
                 baseIntensities = new float[kingdomLights.Length];
@@ -57,6 +62,7 @@ namespace JapaneseDemonHunter.Gameplay
 
         private void Update()
         {
+            if(castleGoal!=null) return; // A wired gate must be physically entered, never won at the facade.
             if (IsComplete || road == null || road.LevelDistance <= 0f)
             {
                 return;
@@ -77,11 +83,13 @@ namespace JapaneseDemonHunter.Gameplay
             }
             var session = GetComponent<GameSessionController>();
             if (session != null && session.Result == GameRunResult.Defeat) return;
+            if(session!=null && session.Phase!=RideSessionPhase.Playing) return;
 
             IsComplete = true;
 
             if (motor != null)
             {
+                motor.SetTravelPaused(true);
                 motor.enabled = false;
             }
 
@@ -95,7 +103,7 @@ namespace JapaneseDemonHunter.Gameplay
                     }
                 }
 
-                spawner.enabled = false;
+                spawner.StopSpawning();
             }
 
             if (giantSpawner != null && giantSpawner.SpawnedGiant != null)
@@ -123,6 +131,13 @@ namespace JapaneseDemonHunter.Gameplay
 
             Debug.Log("Japanese Demon Hunter: the cart reached the fortified kingdom. Victory.", this);
             LevelCompleted?.Invoke();
+            if(victoryFireworks!=null)
+                foreach(var effect in victoryFireworks) if(effect!=null) effect.Play(true);
+        }
+
+        private void OnDestroy()
+        {
+            if(castleGoal!=null) castleGoal.CartArrived-=Complete;
         }
 
         public void Configure(

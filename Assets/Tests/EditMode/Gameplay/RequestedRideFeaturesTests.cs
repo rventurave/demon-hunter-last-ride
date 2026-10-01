@@ -10,6 +10,30 @@ namespace JapaneseDemonHunter.Gameplay.Tests
     {
         [TestCase(-1)]
         [TestCase(1)]
+        public void SteeringReversesDuringCooldownWithoutRequiringBackwardNeutral(int direction)
+        {
+            var machine = new ReinGestureStateMachine(laneThreshold: .15f, brakeEnabled: false);
+            var pull = new Vector3(direction * .2f, 0f, .3f);
+            Assert.AreEqual(direction, machine.Step(true,pull,.016f).Direction);
+            Assert.AreEqual(ReinGestureKind.None,machine.Step(true,new Vector3(0,0,.3f),.016f).Kind);
+            pull.x = -pull.x;
+            Assert.AreEqual(-direction,machine.Step(true,pull,.016f).Direction);
+            for(int i=0;i<50;i++) Assert.AreEqual(ReinGestureKind.None,machine.Step(true,pull,.016f).Kind);
+            pull.x = -pull.x; // A fast tracked movement may skip the neutral sample.
+            Assert.AreEqual(direction,machine.Step(true,pull,.016f).Direction);
+        }
+
+        [Test]
+        public void SteeringNoiseStaysSilentAndLashCooldownRemainsEnforced()
+        {
+            var machine = new ReinGestureStateMachine(laneThreshold: .15f, brakeEnabled: false);
+            Assert.AreEqual(ReinGestureKind.None,machine.Step(true,new Vector3(.05f,0,0),.016f).Kind);
+            machine.Step(true,Vector3.up*.2f,.016f);
+            Assert.AreEqual(ReinGestureKind.Accelerate,machine.Step(true,Vector3.zero,.016f).Kind);
+            Assert.AreEqual(ReinGestureKind.None,machine.Step(true,Vector3.right*.2f,.016f).Kind);
+        }
+        [TestCase(-1)]
+        [TestCase(1)]
         public void ReinSteeringUsesTheExistingSmoothLaneTransitionWithoutHeldPullSpam(int direction)
         {
             var model = new BilateralReinGestureModel(new ReinGestureStateMachine(brakeEnabled: false));

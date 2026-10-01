@@ -43,6 +43,40 @@ namespace JapaneseDemonHunter.GameplayEditor
             Save();
         }
 
+        [MenuItem("Tools/Game/Ride Features/New Round 1 Steering Sensitivity")]
+        public static void SteeringSensitivityRound()
+        {
+            RequireScene();
+            foreach(var handle in UnityEngine.Object.FindObjectsByType<ReinHandle>())
+            {
+                var field = new SerializedObject(handle).FindProperty("laneThreshold");
+                // Migrate only the known previous default; retain manual balance overrides.
+                if (Mathf.Approximately(field.floatValue,.18f)) Set(handle,"laneThreshold",.15f);
+            }
+            Save();
+        }
+
+        [MenuItem("Tools/Game/Ride Features/New Round 2 Small Zombie Balance")]
+        public static void SmallZombieBalanceRound()
+        {
+            RequireScene();
+            foreach(string path in new[]{"Assets/Art/Monsters/Zombie/Prefabs/ZombieDemon.prefab",
+                "Assets/Art/Monsters/Zombie/Prefabs/ZombieHordeDemon.prefab"})
+            {
+            // Modify only the inspected normal zombie asset, never global weapon/hand damage.
+            var root = PrefabUtility.LoadPrefabContents(path);
+            try
+            {
+                var health = root.GetComponent<JapaneseDemonHunter.Monsters.MonsterDamageable>();
+                if (health == null) throw new InvalidOperationException("Normal zombie has no health component");
+                Set(health,"maximumHealth",12f);
+                if (PrefabUtility.SaveAsPrefabAsset(root,path) == null)
+                    throw new InvalidOperationException("Normal zombie prefab could not be saved");
+            }
+            finally { PrefabUtility.UnloadPrefabContents(root); }
+            }
+        }
+
         [MenuItem("Tools/Game/Ride Features/3 Configure Sword Recovery")]
         public static void Priority3()
         {
